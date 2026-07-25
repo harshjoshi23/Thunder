@@ -76,4 +76,6 @@ Without an OpenAI key, the full UI still works in **Demo / fallback mode**.
 
 ## License
 
-MIT — built for Cursor Hackathon Stuttgart.
+**GPL-3.0** — open source (required for the hackathon), but **copyleft**: others who distribute modified versions must also keep them open under GPL-3.0. This is stricter than MIT (people cannot quietly take Thunder closed-source). See [`LICENSE`](LICENSE).
+
+Built for Cursor Hackathon Stuttgart.

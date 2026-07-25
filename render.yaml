@@ -3,18 +3,48 @@ services:
     name: thunder
     runtime: node
     plan: starter
+    region: frankfurt
     buildCommand: npm install && npm run build
     startCommand: npm run start
+    healthCheckPath: /api/health
     envVars:
-      - key: OPENAI_API_KEY
-        sync: false
-      - key: OPENAI_MODEL
-        value: gpt-4o
-      - key: FORCE_MOCK
-        value: "false"
-      - key: ANALYZE_TIMEOUT_MS
-        value: "45000"
-      - key: FAL_KEY
-        sync: false
       - key: NODE_VERSION
         value: "22"
+      - key: FAL_KEY
+        sync: false
+      - key: FAL_TEXT_ENDPOINT
+        value: fal-ai/any-llm
+      - key: FAL_AUDIENCE_MODEL
+        value: google/gemini-2.5-flash-lite
+      - key: FAL_JUROR_MODEL
+        value: google/gemini-2.5-flash
+      - key: FAL_CRITIC_MODEL
+        value: anthropic/claude-3-5-haiku
+      - key: FAL_STRATEGY_MODEL
+        value: google/gemini-2.5-flash
+      - key: FAL_IMAGE_MODEL
+        value: fal-ai/flux/dev
+      - key: FIRECRAWL_API_KEY
+        sync: false
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: ELEVENLABS_VOICE_ID
+        sync: false
+      - key: ELEVENLABS_MODEL_ID
+        value: eleven_multilingual_v2
+      - key: N8N_WEBHOOK_URL
+        sync: false
+      - key: N8N_API_URL
+        sync: false
+      - key: N8N_API_KEY
+        sync: false
+      - key: NEXT_PUBLIC_APP_NAME
+        value: Thunder
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
+      - key: THUNDER_ENABLE_FALLBACK
+        value: "true"
+      - key: ANALYZE_TIMEOUT_MS
+        value: "90000"
+      - key: FORCE_SEEDED_DEMO
+        value: "false"

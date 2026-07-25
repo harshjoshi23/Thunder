@@ -1,0 +1,94 @@
+{
+  "name": "Thunder Approved Content",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "thunder-approved",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook-thunder-approved",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "thunder-approved"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.approved }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-approved",
+      "name": "Only if approved",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const item = items[0].json;\nconst slides = (item.slides || []).map((s, i) => `${i + 1}. ${s.title}\\n${s.body}`).join('\\n\\n');\nconst summary = [\n  `Thunder approved carousel`,\n  `Mode: ${item.mode || 'unknown'}`,\n  `Hook: ${item.hook}`,\n  `CTA: ${item.cta}`,\n  '',\n  'Slides:',\n  slides,\n  '',\n  `Caption: ${item.caption}`,\n  item.voiceoverScript ? `Voiceover: ${item.voiceoverScript.slice(0, 400)}…` : '',\n].filter(Boolean).join('\\n');\nreturn [{ json: { ...item, summary, channelHint: 'Paste summary into Slack/Email manually — Thunder never auto-posts to social.' } }];"
+      },
+      "id": "format-payload",
+      "name": "Format payload",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [740, 220]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, received: true, source: 'thunder', hook: $json.hook } }}"
+      },
+      "id": "respond-ok",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [980, 220]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: false, reason: 'not_approved' } }}"
+      },
+      "id": "respond-reject",
+      "name": "Respond reject",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [740, 400]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Only if approved", "type": "main", "index": 0 }]]
+    },
+    "Only if approved": {
+      "main": [
+        [{ "node": "Format payload", "type": "main", "index": 0 }],
+        [{ "node": "Respond reject", "type": "main", "index": 0 }]
+      ]
+    },
+    "Format payload": {
+      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": [
+    {
+      "name": "thunder"
+    }
+  ]
+}

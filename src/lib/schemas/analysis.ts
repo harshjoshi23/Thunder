@@ -92,6 +92,27 @@ export const GuardrailFindingSchema = z.object({
 
 export type GuardrailFinding = z.infer<typeof GuardrailFindingSchema>;
 
+export const AudienceResearchSchema = z.object({
+  segments: z.array(SegmentSchema).length(3),
+});
+
+export type AudienceResearch = z.infer<typeof AudienceResearchSchema>;
+
+export const JurorOutputSchema = z.object({
+  reaction: ReactionSchema,
+});
+
+export type JurorOutput = z.infer<typeof JurorOutputSchema>;
+
+export const CriticOutputSchema = z.object({
+  factors: FactorsSchema,
+  guardrails: z.array(GuardrailFindingSchema).max(8),
+  strengths: z.array(z.string()).min(1).max(5),
+  weaknesses: z.array(z.string()).min(1).max(5),
+});
+
+export type CriticOutput = z.infer<typeof CriticOutputSchema>;
+
 export const Call1OutputSchema = z.object({
   segments: z.array(SegmentSchema).length(3),
   reactions: z.array(ReactionSchema).length(3),
@@ -131,6 +152,7 @@ export const Call2OutputSchema = z.object({
   slides: z.array(SlideSchema).length(5),
   caption: z.string().min(1),
   cta: z.string().min(1),
+  voiceoverScript: z.string().min(1).max(2500),
   changeExplanations: z
     .array(
       z.object({
@@ -159,8 +181,25 @@ export type Diagnostics = z.infer<typeof DiagnosticsSchema>;
 export const ConfidenceSchema = z.enum(["low", "medium", "high"]);
 export type Confidence = z.infer<typeof ConfidenceSchema>;
 
+export const RunModeSchema = z.enum([
+  "live",
+  "seeded_demo",
+  "recovery_fallback",
+]);
+export type RunMode = z.infer<typeof RunModeSchema>;
+
+export const TraceStepSchema = z.object({
+  node: z.string(),
+  status: z.enum(["ok", "skip", "error", "retry"]),
+  detail: z.string().optional(),
+  model: z.string().optional(),
+  ms: z.number().optional(),
+});
+
+export type TraceStep = z.infer<typeof TraceStepSchema>;
+
 export const AnalyzeResultSchema = z.object({
-  mode: z.enum(["live", "fallback"]),
+  mode: RunModeSchema,
   confidence: ConfidenceSchema,
   comments: z.array(
     z.object({
@@ -170,6 +209,7 @@ export const AnalyzeResultSchema = z.object({
   ),
   creatorContext: z.string(),
   draftPost: z.string(),
+  sourceUrl: z.string().optional(),
   segments: z.array(SegmentSchema).length(3),
   reactions: z.array(ReactionSchema).length(3),
   factors: FactorsSchema,
@@ -184,6 +224,7 @@ export const AnalyzeResultSchema = z.object({
     slides: z.array(SlideSchema).length(5),
     caption: z.string(),
     cta: z.string(),
+    voiceoverScript: z.string(),
     changeExplanations: z.array(
       z.object({
         change: z.string(),
@@ -197,7 +238,34 @@ export const AnalyzeResultSchema = z.object({
     primaryStrength: z.string(),
     primaryWeakness: z.string(),
     agentTrace: z.array(z.string()),
+    executionTrace: z.array(TraceStepSchema).optional(),
+    modelsUsed: z
+      .object({
+        audience: z.string().optional(),
+        juror: z.string().optional(),
+        critic: z.string().optional(),
+        strategy: z.string().optional(),
+        image: z.string().optional(),
+      })
+      .optional(),
   }),
 });
 
 export type AnalyzeResult = z.infer<typeof AnalyzeResultSchema>;
+
+export const N8nExportPayloadSchema = z.object({
+  source: z.literal("thunder"),
+  approved: z.literal(true),
+  exportedAt: z.string(),
+  hook: z.string().min(1),
+  slides: z.array(z.object({ title: z.string(), body: z.string() })).length(5),
+  caption: z.string().min(1),
+  cta: z.string().min(1),
+  voiceoverScript: z.string().optional(),
+  coverImageUrl: z.string().optional(),
+  mode: RunModeSchema.optional(),
+  confidence: ConfidenceSchema.optional(),
+  diagnostics: DiagnosticsSchema.optional(),
+});
+
+export type N8nExportPayload = z.infer<typeof N8nExportPayloadSchema>;

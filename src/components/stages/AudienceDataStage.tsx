@@ -8,18 +8,29 @@ export function AudienceDataStage({
   commentsText,
   creatorContext,
   draftPost,
+  sourceUrl,
   onChange,
   onLoadSeed,
   onRun,
+  onFetchSource,
   running,
+  fetchingSource,
+  sourceMsg,
 }: {
   commentsText: string;
   creatorContext: string;
   draftPost: string;
-  onChange: (field: "commentsText" | "creatorContext" | "draftPost", value: string) => void;
+  sourceUrl: string;
+  onChange: (
+    field: "commentsText" | "creatorContext" | "draftPost" | "sourceUrl",
+    value: string,
+  ) => void;
   onLoadSeed: () => void;
   onRun: () => void;
+  onFetchSource: () => void;
   running: boolean;
+  fetchingSource: boolean;
+  sourceMsg: string | null;
 }) {
   return (
     <section className="animate-fade-in space-y-6">
@@ -41,6 +52,37 @@ export function AudienceDataStage({
         <Button type="button" size="lg" onClick={onRun} disabled={running}>
           {running ? "Running…" : "Run Audience Test"}
         </Button>
+      </div>
+
+      <div className="rounded-xl border border-ink/10 bg-white/55 p-4">
+        <label className="block text-sm font-medium text-ink">
+          Optional source URL (Firecrawl)
+        </label>
+        <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+          <input
+            type="url"
+            value={sourceUrl}
+            onChange={(e) => onChange("sourceUrl", e.target.value)}
+            placeholder="https://…"
+            className="min-w-0 flex-1 rounded-lg border border-ink/15 bg-white px-3 py-2 text-sm text-ink outline-none focus:border-teal-700"
+          />
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onFetchSource}
+            disabled={fetchingSource || !sourceUrl.trim()}
+          >
+            {fetchingSource ? "Fetching…" : "Fetch source"}
+          </Button>
+        </div>
+        {sourceMsg ? (
+          <p className="mt-2 text-xs text-ink/55">{sourceMsg}</p>
+        ) : (
+          <p className="mt-2 text-xs text-ink/45">
+            Without FIRECRAWL_API_KEY this stays a recovery fallback — paste
+            comments manually.
+          </p>
+        )}
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">

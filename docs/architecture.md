@@ -1,4 +1,4 @@
-# Thunder architecture (presentation-grade)
+# Thunder architecture
 
 Import into [diagrams.net](https://app.diagrams.net): **Arrange → Insert → Advanced → Mermaid**.
 
@@ -10,52 +10,79 @@ flowchart TB
     Browser[Browser_Workspace]
   end
 
-  subgraph thunderApp [Thunder_on_Render_or_Vercel]
+  subgraph thunderApp [Thunder_on_Render]
     UI[Nextjs_UI_6_Stages]
+    API_H["/api/health"]
+    API_S["/api/source"]
     API_A["/api/analyze"]
     API_C["/api/cover"]
-    API_E["/api/export"]
+    API_V["/api/voiceover"]
+    API_E["/api/export/n8n"]
     Graph[LangGraph_MultiAgent]
     Score[Deterministic_Scoring_TS]
     Evidence[Evidence_Validator]
-    Mock[Mock_Fallback]
+    Fallback[Seeded_demo_or_Recovery_fallback]
   end
 
-  subgraph external [External_optional]
-    OpenAI[OpenAI_API]
-    Fal[fal.ai]
+  subgraph external [External]
+    FalLM["fal-ai/any-llm"]
+    FalImg["fal-ai/flux/dev"]
+    Firecrawl[Firecrawl]
+    Eleven[ElevenLabs]
     N8N[n8n_Webhook]
   end
 
   Browser --> UI
   UI --> API_A
+  UI --> API_S
   UI --> API_C
+  UI --> API_V
   UI --> API_E
   API_A --> Graph
-  Graph -->|structured_Call1_Call2| OpenAI
+  Graph -->|structured JSON| FalLM
   Graph --> Evidence
   Graph --> Score
-  Graph -.->|no_key_or_error| Mock
-  API_C -.-> Fal
+  Graph -.->|no key or error| Fallback
+  API_C --> FalImg
+  API_S -.-> Firecrawl
+  API_V -.-> Eleven
   API_E -.-> N8N
-  Mock --> UI
+  Fallback --> UI
   Score --> UI
 ```
 
-## Agent graph (what “real agents” means)
+## Agent graph
 
 ```mermaid
-flowchart LR
-  N[normalizeComments] --> A[Call1_Research_Simulate_Critic]
-  A --> V[verifyEvidence]
-  V -->|retry_once| A
-  V --> S[scoreDiagnostics]
-  S --> C[Call2_ContentStrategy]
-  C --> F[finalize]
-  A -.->|fail| M[mockFallback]
-  C -.->|fail| M
-  M --> F
+flowchart TB
+  N[normalizeComments] --> A[audienceResearch_fal]
+  A --> E[evidenceValidate]
+  E -->|retry once| A
+  E --> F[jurorFanout]
+  F --> J1[juror1]
+  F --> J2[juror2]
+  F --> J3[juror3]
+  J1 --> C[critic_fal]
+  J2 --> C
+  J3 --> C
+  C --> S[originalScoring_TS]
+  S --> ST[strategy_fal_voiceover]
+  ST --> O[optimizedEval_TS]
+  O --> V[finalVerify]
+  A -.->|fail| M[recovery_fallback]
+  ST -.->|fail| M
+  M --> V
 ```
+
+## Model IDs
+
+| Node | Model |
+|------|-------|
+| Audience | `google/gemini-2.5-flash-lite` via `fal-ai/any-llm` |
+| Jurors | `google/gemini-2.5-flash` |
+| Critic | `anthropic/claude-3-5-haiku` |
+| Strategy | `google/gemini-2.5-flash` |
+| Cover | `fal-ai/flux/dev` |
 
 ## UI stage map
 
@@ -68,28 +95,15 @@ flowchart LR
   S5 --> S6[6_BeforeAfter]
 ```
 
-## Data honesty
+## Honesty modes
 
 ```mermaid
-flowchart TB
-  Comments[Imported_comments_C01_Cn] --> Twin[3_Segments]
-  Twin --> Jury[Segment_Reactions]
-  Draft[Draft_text] --> Jury
-  Jury --> Factors[Factors_0_to_10]
-  Factors --> Formulas[TS_Formulas_0_to_100]
-  Formulas --> BA[Before_vs_After]
-  Twin --> Strategy[5_Slides]
-  Formulas --> Strategy
+flowchart LR
+  Live[Live] -->|FAL_KEY + validated JSON| UI
+  Seeded[Seeded_demo] -->|force or Load seeded demo| UI
+  Recovery[Recovery_fallback] -->|missing key or pipeline error| UI
 ```
 
-## Scaling note (pitch only — not built)
+## Future scale (not implemented)
 
-For a hackathon demo, one Node process on Render is enough.
-
-**If** Thunder grew to many concurrent analyses later:
-
-- Queue long LLM jobs (e.g. Redis/BullMQ) so HTTP requests don’t time out
-- Keep scoring/evidence in-process (CPU-cheap)
-- Kafka-style brokers are unnecessary until you have event fan-out across many services
-
-Do not build this for the submission.
+Redis / Kafka fan-out for multi-tenant orchestration is **out of hackathon scope**. Documented in README only.

@@ -1,4 +1,10 @@
-import type { AnalyzeResult, Call1Output, Call2Output } from "@/lib/schemas";
+import type {
+  AnalyzeResult,
+  Call1Output,
+  Call2Output,
+  RunMode,
+  TraceStep,
+} from "@/lib/schemas";
 import { normalizeComments } from "@/lib/evidence/normalize";
 import {
   allEvidenceValid,
@@ -189,6 +195,8 @@ export const MOCK_CALL2: Call2Output = {
   caption:
     "Consistency that respects your job > grind cosplay. Here’s a realistic rhythm, a 20-minute plan, and when to stop — grounded in what my comments actually ask for.",
   cta: "Save this for your next quiet evening — and tell me your real weekly cadence.",
+  voiceoverScript:
+    "You don’t need to post every day. You need a system that survives a full-time job. Consistency is a rhythm you can repeat — for many people, two or three quality posts a week beats daily burnout. Say who this is for up front: employees with about twenty minutes at night. Here’s the plan: five minutes to capture an idea, ten to draft one slide or caption, five to schedule or park it. Beginners pick one format for four weeks. Busy pros batch Sunday outlines and publish Tuesday and Thursday. And when should you skip? When you’re posting from guilt, sleeping under six hours, or repeating content with no learning. Rest is part of the system. Save this for your next quiet evening.",
   changeExplanations: [
     {
       change: "Replaced ‘post every day or never grow’ with a bounded hook",
@@ -229,13 +237,16 @@ export const MOCK_CALL2: Call2Output = {
 };
 
 export function buildAnalyzeResultFromParts(args: {
-  mode: "live" | "fallback";
+  mode: RunMode;
   commentsText: string;
   creatorContext: string;
   draftPost: string;
+  sourceUrl?: string;
   call1: Call1Output;
   call2: Call2Output;
   agentTrace?: string[];
+  executionTrace?: TraceStep[];
+  modelsUsed?: AnalyzeResult["meta"]["modelsUsed"];
 }): AnalyzeResult {
   const comments = normalizeComments(args.commentsText);
   const repaired1 = repairCall1Evidence(args.call1, comments).output;
@@ -259,6 +270,7 @@ export function buildAnalyzeResultFromParts(args: {
     comments,
     creatorContext: args.creatorContext,
     draftPost: args.draftPost,
+    sourceUrl: args.sourceUrl,
     segments: repaired1.segments,
     reactions: repaired1.reactions,
     factors: repaired1.factors,
@@ -273,6 +285,7 @@ export function buildAnalyzeResultFromParts(args: {
       slides: repaired2.slides,
       caption: repaired2.caption,
       cta: repaired2.cta,
+      voiceoverScript: repaired2.voiceoverScript,
       changeExplanations: repaired2.changeExplanations,
     },
     meta: {
@@ -281,12 +294,19 @@ export function buildAnalyzeResultFromParts(args: {
       primaryWeakness: repaired1.weaknesses[0] ?? "Draft specificity",
       agentTrace: args.agentTrace ?? [
         "normalizeComments",
-        "analyzeAudienceAndDraft",
-        "verifyEvidence",
-        "scoreDiagnostics",
-        "optimizeCarousel",
-        "finalize",
+        "audienceResearch",
+        "evidenceValidate",
+        "juror1",
+        "juror2",
+        "juror3",
+        "critic",
+        "originalScoring",
+        "strategy",
+        "optimizedEval",
+        "finalVerify",
       ],
+      executionTrace: args.executionTrace,
+      modelsUsed: args.modelsUsed,
     },
   };
 }
@@ -296,20 +316,34 @@ export function getMockAnalyzeResult(
     commentsText: string;
     creatorContext: string;
     draftPost: string;
+    sourceUrl: string;
   }>,
+  mode: RunMode = "seeded_demo",
 ): AnalyzeResult {
+  const label =
+    mode === "seeded_demo"
+      ? "seeded_demo (demo data)"
+      : "recovery_fallback (services missing or failed)";
   return buildAnalyzeResultFromParts({
-    mode: "fallback",
+    mode,
     commentsText: overrides?.commentsText ?? SEED_INPUT.commentsText,
     creatorContext: overrides?.creatorContext ?? SEED_INPUT.creatorContext,
     draftPost: overrides?.draftPost ?? SEED_INPUT.draftPost,
+    sourceUrl: overrides?.sourceUrl,
     call1: MOCK_CALL1,
     call2: MOCK_CALL2,
     agentTrace: [
       "normalizeComments",
-      "mockFallback (demo data)",
-      "scoreDiagnostics",
-      "finalize",
+      label,
+      "originalScoring",
+      "optimizedEval",
+      "finalVerify",
+    ],
+    executionTrace: [
+      { node: "normalizeComments", status: "ok" },
+      { node: label, status: "skip", detail: mode },
+      { node: "originalScoring", status: "ok" },
+      { node: "finalVerify", status: "ok", detail: mode },
     ],
   });
 }

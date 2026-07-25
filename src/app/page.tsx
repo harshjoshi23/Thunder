@@ -24,6 +24,9 @@ export default function HomePage() {
     SEED_INPUT.creatorContext,
   );
   const [draftPost, setDraftPost] = useState<string>(SEED_INPUT.draftPost);
+  const [sourceUrl, setSourceUrl] = useState("");
+  const [sourceMsg, setSourceMsg] = useState<string | null>(null);
+  const [fetchingSource, setFetchingSource] = useState(false);
   const [stage, setStage] = useState(1);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +42,8 @@ export default function HomePage() {
     setCommentsText(SEED_INPUT.commentsText);
     setCreatorContext(SEED_INPUT.creatorContext);
     setDraftPost(SEED_INPUT.draftPost);
+    setSourceUrl("");
+    setSourceMsg(null);
     setError(null);
   }
 
@@ -48,6 +53,42 @@ export default function HomePage() {
     setStage(1);
     setError(null);
     setRunning(false);
+  }
+
+  async function fetchSource() {
+    setFetchingSource(true);
+    setSourceMsg(null);
+    try {
+      const res = await fetch("/api/source", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: sourceUrl }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        markdown?: string;
+        message?: string;
+        mode?: string;
+      };
+      setSourceMsg(data.message ?? null);
+      if (data.markdown?.trim()) {
+        // Prefer extracting comment-like lines; fall back to full markdown
+        const lines = data.markdown
+          .split("\n")
+          .map((l) => l.replace(/^[-*•]\s*/, "").trim())
+          .filter((l) => l.length > 20 && l.length < 280)
+          .slice(0, 20);
+        if (lines.length >= 3) {
+          setCommentsText(lines.join("\n"));
+        } else {
+          setCommentsText(data.markdown.slice(0, 8000));
+        }
+      }
+    } catch {
+      setSourceMsg("Source fetch failed — paste comments manually.");
+    } finally {
+      setFetchingSource(false);
+    }
   }
 
   async function runAnalysis() {
@@ -62,6 +103,7 @@ export default function HomePage() {
           commentsText,
           creatorContext,
           draftPost,
+          sourceUrl: sourceUrl.trim() || undefined,
         }),
       });
       const json: unknown = await res.json();
@@ -131,21 +173,28 @@ export default function HomePage() {
           </div>
         ) : null}
 
-        {running ? <LoadingOrchestra /> : null}
+        {running ? (
+          <LoadingOrchestra trace={result?.meta.executionTrace} />
+        ) : null}
 
         {!running && stage === 1 ? (
           <AudienceDataStage
             commentsText={commentsText}
             creatorContext={creatorContext}
             draftPost={draftPost}
+            sourceUrl={sourceUrl}
             onChange={(field, value) => {
               if (field === "commentsText") setCommentsText(value);
               if (field === "creatorContext") setCreatorContext(value);
               if (field === "draftPost") setDraftPost(value);
+              if (field === "sourceUrl") setSourceUrl(value);
             }}
             onLoadSeed={loadSeed}
             onRun={runAnalysis}
+            onFetchSource={fetchSource}
             running={running}
+            fetchingSource={fetchingSource}
+            sourceMsg={sourceMsg}
           />
         ) : null}
 
@@ -175,6 +224,8 @@ export default function HomePage() {
           Thunder runs a grounded scenario simulation based on patterns in the
           creator’s supplied audience data. It does not predict real humans
           perfectly, guarantee virality, or produce scientific view forecasts.
+          Modes are labeled Live / Seeded demo / Recovery fallback — never
+          silently faked as live.
         </footer>
       </main>
     </div>

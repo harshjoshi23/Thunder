@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EvidenceList } from "@/components/shared/EvidenceList";
 import { Accordion } from "@/components/ui/accordion";
+import { TechnicalCredibilityPanel } from "@/components/shared/LoadingOrchestra";
 
 export function CarouselStage({ result }: { result: AnalyzeResult }) {
   const [coverUrl, setCoverUrl] = useState("/og-cover.svg");
@@ -13,12 +14,15 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
   const [loadingCover, setLoadingCover] = useState(false);
   const [exportMsg, setExportMsg] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [voiceMsg, setVoiceMsg] = useState<string | null>(null);
+  const [voiceLoading, setVoiceLoading] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   async function exportToN8n() {
     setExporting(true);
     setExportMsg(null);
     try {
-      const res = await fetch("/api/export", {
+      const res = await fetch("/api/export/n8n", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -26,7 +30,11 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
           slides: result.optimized.slides,
           caption: result.optimized.caption,
           cta: result.optimized.cta,
+          voiceoverScript: result.optimized.voiceoverScript,
+          coverImageUrl: coverUrl.startsWith("http") ? coverUrl : undefined,
           mode: result.mode,
+          confidence: result.confidence,
+          diagnostics: result.optimizedDiagnostics,
         }),
       });
       const data = (await res.json()) as {
@@ -37,7 +45,7 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
       setExportMsg(
         data.message ??
           (data.ok
-            ? "Exported to n8n webhook."
+            ? "Approved & sent to n8n."
             : "Export skipped — set N8N_WEBHOOK_URL to enable."),
       );
     } catch {
@@ -63,19 +71,55 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
         imageUrl?: string;
         message?: string;
         fallback?: boolean;
+        mode?: string;
       };
       if (data.imageUrl) setCoverUrl(data.imageUrl);
       setCoverMsg(
         data.message ??
           (data.fallback
-            ? "Using designed fallback cover."
+            ? "Recovery fallback cover."
             : "Cover generated with fal.ai."),
       );
     } catch {
       setCoverUrl("/og-cover.svg");
-      setCoverMsg("Cover generation failed — fallback retained.");
+      setCoverMsg("Cover generation failed — recovery fallback retained.");
     } finally {
       setLoadingCover(false);
+    }
+  }
+
+  async function generateVoiceover() {
+    setVoiceLoading(true);
+    setVoiceMsg(null);
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+      setAudioUrl(null);
+    }
+    try {
+      const res = await fetch("/api/voiceover", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: result.optimized.voiceoverScript }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        audioBase64?: string | null;
+        mimeType?: string | null;
+        message?: string;
+        script?: string;
+      };
+      setVoiceMsg(data.message ?? null);
+      if (data.audioBase64 && data.mimeType) {
+        const binary = atob(data.audioBase64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        const blob = new Blob([bytes], { type: data.mimeType });
+        setAudioUrl(URL.createObjectURL(blob));
+      }
+    } catch {
+      setVoiceMsg("Voiceover failed — script still available below.");
+    } finally {
+      setVoiceLoading(false);
     }
   }
 
@@ -87,9 +131,11 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
         </h2>
         <p className="mt-2 text-ink/65">
           Content Strategy Agent resolved segment trade-offs into five slides,
-          with evidence-linked change explanations.
+          with evidence-linked change explanations and a voiceover script.
         </p>
       </div>
+
+      <TechnicalCredibilityPanel result={result} />
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <div className="space-y-3">
@@ -105,7 +151,15 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
             onClick={generateCover}
             disabled={loadingCover}
           >
-            {loadingCover ? "Generating…" : "Generate cover (fal.ai)"}
+            {loadingCover ? "Generating…" : "Generate Cover"}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={generateVoiceover}
+            disabled={voiceLoading}
+          >
+            {voiceLoading ? "Generating…" : "Generate Voiceover"}
           </Button>
           <Button
             type="button"
@@ -113,13 +167,19 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
             onClick={exportToN8n}
             disabled={exporting}
           >
-            {exporting ? "Exporting…" : "Export to n8n"}
+            {exporting ? "Sending…" : "Approve & Send to n8n"}
           </Button>
           {coverMsg ? (
             <p className="text-xs text-ink/55">{coverMsg}</p>
           ) : null}
+          {voiceMsg ? (
+            <p className="text-xs text-ink/55">{voiceMsg}</p>
+          ) : null}
           {exportMsg ? (
             <p className="text-xs text-ink/55">{exportMsg}</p>
+          ) : null}
+          {audioUrl ? (
+            <audio controls src={audioUrl} className="w-full" />
           ) : null}
         </div>
 
@@ -161,6 +221,15 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
               </p>
               <p className="mt-2 text-sm text-ink/80">{result.optimized.cta}</p>
             </div>
+          </div>
+
+          <div className="rounded-xl border border-ink/10 bg-white/55 p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-ink/50">
+              Voiceover script
+            </p>
+            <p className="mt-2 whitespace-pre-wrap text-sm text-ink/80">
+              {result.optimized.voiceoverScript}
+            </p>
           </div>
 
           <div className="rounded-xl border border-ink/10 bg-white/55 p-4">

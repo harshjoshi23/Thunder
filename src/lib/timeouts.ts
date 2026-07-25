@@ -1,7 +1,7 @@
 export function getAnalyzeTimeoutMs(): number {
   const raw = process.env.ANALYZE_TIMEOUT_MS;
-  const n = raw ? Number(raw) : 45000;
-  return Number.isFinite(n) && n > 0 ? n : 45000;
+  const n = raw ? Number(raw) : 90000;
+  return Number.isFinite(n) && n > 0 ? n : 90000;
 }
 
 export function withTimeout<T>(

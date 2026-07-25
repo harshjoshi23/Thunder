@@ -8,18 +8,19 @@ Thunder helps creators **rehearse** a post against their own audience comments b
 4. A strategy agent rewrites a 5-slide carousel
 5. Optional: cover image, voiceover, send to n8n
 
+No login. No native social posting.
+
 ## Modes (always labeled)
 
 | Badge | When |
 |-------|------|
-| **Live** | `FAL_KEY` set and LangGraph + fal succeeded |
+| **Live** | Language agents succeeded with OpenAI (or fal LM fallback) |
 | **Seeded demo** | Load seeded demo / force demo |
 | **Recovery fallback** | Missing keys or pipeline error — same UI, clearly not Live |
 
-## Models (via fal)
+## Models
 
-- Audience: `google/gemini-2.5-flash-lite`
-- Jurors: `google/gemini-2.5-flash`
-- Critic: `anthropic/claude-3-5-haiku`
-- Strategy: `google/gemini-2.5-flash`
-- Image: `fal-ai/flux/dev`
+- **Preferred language:** OpenAI (`gpt-4o-mini` defaults) when `OPENAI_API_KEY` is set
+- **Fallback language:** fal.ai `any-llm` when only `FAL_KEY` is set
+- **Cover image:** fal Flux when `FAL_KEY` is set
+- **Voice:** ElevenLabs when configured

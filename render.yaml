@@ -10,6 +10,16 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "22"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_AUDIENCE_MODEL
+        value: gpt-4o-mini
+      - key: OPENAI_JUROR_MODEL
+        value: gpt-4o-mini
+      - key: OPENAI_CRITIC_MODEL
+        value: gpt-4o-mini
+      - key: OPENAI_STRATEGY_MODEL
+        value: gpt-4o-mini
       - key: FAL_KEY
         sync: false
       - key: FAL_TEXT_ENDPOINT

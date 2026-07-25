@@ -27,19 +27,19 @@ export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/apple-icon", sizes: "180x180" }],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180" }],
   },
   openGraph: {
     title: "Thunder",
     description: "Test your post before your audience does.",
-    images: [{ url: "/og-cover.svg", width: 1024, height: 1024 }],
+    images: [{ url: "/og-cover.png", width: 512, height: 512 }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Thunder",
     description: "Test your post before your audience does.",
-    images: ["/og-cover.svg"],
+    images: ["/og-cover.png"],
   },
   manifest: "/manifest.webmanifest",
 };

@@ -9,7 +9,7 @@ import { Accordion } from "@/components/ui/accordion";
 import { TechnicalCredibilityPanel } from "@/components/shared/LoadingOrchestra";
 
 export function CarouselStage({ result }: { result: AnalyzeResult }) {
-  const [coverUrl, setCoverUrl] = useState("/og-cover.svg");
+  const [coverUrl, setCoverUrl] = useState("/og-cover.png");
   const [coverMsg, setCoverMsg] = useState<string | null>(null);
   const [loadingCover, setLoadingCover] = useState(false);
   const [exportMsg, setExportMsg] = useState<string | null>(null);
@@ -81,7 +81,7 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
             : "Cover generated with fal.ai."),
       );
     } catch {
-      setCoverUrl("/og-cover.svg");
+      setCoverUrl("/og-cover.png");
       setCoverMsg("Cover generation failed — recovery fallback retained.");
     } finally {
       setLoadingCover(false);

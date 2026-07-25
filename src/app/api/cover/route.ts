@@ -39,7 +39,7 @@ export async function POST(request: Request) {
         ok: false,
         fallback: true,
         mode: "recovery_fallback",
-        imageUrl: "/og-cover.svg",
+        imageUrl: "/og-cover.png",
         model: getFalImageModel(),
         message: `Recovery fallback cover: ${message}`,
       });
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       ok: false,
       fallback: true,
       mode: "recovery_fallback",
-      imageUrl: "/og-cover.svg",
+      imageUrl: "/og-cover.png",
       message:
         "FAL_KEY not configured or no image returned — using designed fallback cover (recovery fallback).",
     });
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       ok: false,
       fallback: true,
       mode: "recovery_fallback",
-      imageUrl: "/og-cover.svg",
+      imageUrl: "/og-cover.png",
       message,
     });
   }

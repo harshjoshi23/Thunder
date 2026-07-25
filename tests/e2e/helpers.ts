@@ -4,7 +4,8 @@ import fs from "node:fs";
 
 export const SCREENSHOT_DIR = path.join(
   process.cwd(),
-  "docs/samples/screenshots",
+  ".tmp",
+  "playwright-screenshots",
 );
 
 export async function ensureScreenshotDir() {

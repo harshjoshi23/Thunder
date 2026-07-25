@@ -55,3 +55,6 @@ next-env.d.ts
 *.local.md
 .tmp/
 .cache/
+
+# private recording notes (customize locally)
+docs/video-recording-private.md

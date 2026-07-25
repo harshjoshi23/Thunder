@@ -10,22 +10,16 @@ Thunder adds: comment IDs as evidence, Zod validation + repair, deterministic Ty
 
 ## Are the agents “real”?
 
-Yes when `FAL_KEY` is set: LangGraph calls `fal-ai/any-llm` with distinct models for audience, jurors, critic, and strategy. Scoring and evidence checks are TypeScript, not LLM.
+Yes when a language key is set: LangGraph calls **OpenAI** (preferred) or fal `any-llm` with distinct roles for audience, jurors, critic, and strategy. Scoring and evidence checks are TypeScript, not LLM.
 
 ## Which models?
 
-| Role | ID |
-|------|----|
-| Audience | `google/gemini-2.5-flash-lite` |
-| Jurors | `google/gemini-2.5-flash` |
-| Critic | `anthropic/claude-3-5-haiku` |
-| Strategy | `google/gemini-2.5-flash` |
+| Role | Default |
+|------|---------|
+| Audience / Jurors / Critic / Strategy | OpenAI `gpt-4o-mini` when `OPENAI_API_KEY` set |
+| Language fallback | fal any-llm (Gemini / Claude catalog IDs in `render.yaml`) |
 | Image | `fal-ai/flux/dev` |
 | Voice | `eleven_multilingual_v2` |
-
-## Why fal not OpenAI direct?
-
-Hackathon credits / unified routing via fal; OpenAI-only default was removed. Models are still selected through fal’s any-llm catalog.
 
 ## Does it predict views?
 
@@ -35,14 +29,14 @@ No. Explicitly a grounded simulation with transparent formulas.
 
 UI still works. Badge shows **Seeded demo** or **Recovery fallback**. Never claims Live.
 
-## Redis / Kafka?
+## Social posting / login?
 
-Future scale idea only — not built for the hackathon.
+No OAuth to Instagram, TikTok, Reddit, or Twitter. No user login for the hackathon demo. Optional n8n webhook after human approve.
 
 ## n8n?
 
 Import `n8n/thunder-approved-content.workflow.json`, paste webhook into `N8N_WEBHOOK_URL`. Thunder never auto-posts to social.
 
-## Keys judges should know we need
+## Keys for a Live demo
 
-`FAL_KEY`, optional `FIRECRAWL_API_KEY`, `ELEVENLABS_API_KEY` + `ELEVENLABS_VOICE_ID`, `N8N_WEBHOOK_URL`, Render env from `render.yaml`.
+`OPENAI_API_KEY` (preferred), optional `FAL_KEY`, `FIRECRAWL_API_KEY`, `ELEVENLABS_API_KEY` + `ELEVENLABS_VOICE_ID`, `N8N_WEBHOOK_URL`. See `render.yaml` / [developer-setup.md](developer-setup.md).

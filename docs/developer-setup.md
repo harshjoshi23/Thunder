@@ -1,6 +1,6 @@
 # Thunder — developer setup
 
-Env **names** only. Never commit `.env.local` or paste real keys into docs.
+Env **names** only. Never commit `.env.local` or paste real keys into docs or git.
 
 ## Environment variables
 
@@ -46,11 +46,13 @@ npm run test:e2e
 
 API: `POST /api/export/n8n`
 
-## Render
+## Render (5 steps)
 
-1. Connect the GitHub repo
-2. Use `render.yaml` (Frankfurt, health `/api/health`)
-3. Set env vars from the table above (at minimum `OPENAI_API_KEY` for live agents)
+1. Dashboard → **New** → **Blueprint**
+2. Connect GitHub repo `harshjoshi23/Thunder`, branch `main`
+3. Confirm `render.yaml` (Frankfurt, health `/api/health`)
+4. Set env vars from the table (minimum `OPENAI_API_KEY` for live agents; set `NEXT_PUBLIC_APP_URL` to the Render URL)
+5. Deploy and open `/api/health`
 
 ## Local live smoke (optional, costs tokens)
 
@@ -62,3 +64,7 @@ curl -s http://localhost:3000/api/health
 ```
 
 Then run one Audience Test from the UI. Prefer `gpt-4o-mini` defaults to limit cost.
+
+## Security
+
+Rotate any API key that may have been exposed in chat, screenshots, or accidental commits. `.env.local` is gitignored — keep it that way.

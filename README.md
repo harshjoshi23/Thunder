@@ -4,7 +4,9 @@
 
 Thunder is a pre-publication **scenario lab** for creators: turn historical comments into an evidence-backed audience twin, run a multi-agent jury rehearsal, score the draft with transparent TypeScript formulas, and ship an improved five-slide carousel — with modes labeled honestly as **Live**, **Seeded demo**, or **Recovery fallback**.
 
-> Grounded simulation from *your* imported comments. Not a view predictor. Not a virality guarantee.
+> Grounded simulation from *your* imported comments. Not a view predictor. Not a virality guarantee. No login.
+
+![Thunder Audience Data](docs/images/01-audience-data.png)
 
 ## Problem
 
@@ -29,6 +31,18 @@ Creators publish into silence or backlash because they only learn audience react
 | Carousel | Optimized slides + optional cover/voice/n8n |
 | Before / After | Score deltas + credibility panel |
 
+## Screenshots (real product UI)
+
+| Stage | Preview |
+|-------|---------|
+| Audience Data | ![input](docs/images/01-audience-data.png) |
+| Running agents | ![running](docs/images/03-running.png) |
+| Audience Twin | ![twin](docs/images/04-audience-twin.png) |
+| Reaction Lab | ![jury](docs/images/05-reaction-lab.png) |
+| Diagnostics | ![diagnostics](docs/images/06-diagnostics.png) |
+| Carousel | ![carousel](docs/images/08-carousel-slides.png) |
+| Before / After | ![before-after](docs/images/09-before-after.png) |
+
 ## Jury & evidence
 
 - Evidence IDs (`C01`…) come only from imported comments
@@ -44,10 +58,6 @@ normalize → audience → evidence → juror×3 (parallel) → critic
   → TS scoring → strategy (+ voiceoverScript) → optimized eval → verify
 ```
 
-## Before / after
-
-Diagnostics (clarity, specificity, audience fit, confidence) are computed in TypeScript from factor ratings. Strategy proposes bounded deltas; optimized scores are recomputed — not invented by the LLM.
-
 ## Sponsors / integrations actually used
 
 | Integration | Role | Status |
@@ -58,20 +68,6 @@ Diagnostics (clarity, specificity, audience fit, confidence) are computed in Typ
 | ElevenLabs | Optional voiceover audio | Optional |
 | n8n | Approve & send webhook | Optional |
 | Cursor | Build environment | Used |
-
-## Screenshots
-
-Playwright captures light/dark × desktop/mobile samples under [`docs/samples/screenshots/`](docs/samples/screenshots/).
-
-| Flow | Light desktop | Dark mobile |
-|------|---------------|-------------|
-| Input | ![input-light-desktop](docs/samples/screenshots/input-light-desktop.png) | ![input-dark-mobile](docs/samples/screenshots/input-dark-mobile.png) |
-| Running | ![running-light-desktop](docs/samples/screenshots/running-light-desktop.png) | — |
-| Twin | ![twin-light-desktop](docs/samples/screenshots/twin-light-desktop.png) | — |
-| Jury | ![jury-light-desktop](docs/samples/screenshots/jury-light-desktop.png) | — |
-| Diagnostics | ![diagnostics-light-desktop](docs/samples/screenshots/diagnostics-light-desktop.png) | — |
-| Carousel | ![carousel-light-desktop](docs/samples/screenshots/carousel-light-desktop.png) | — |
-| Before/After | ![before-after-light-desktop](docs/samples/screenshots/before-after-light-desktop.png) | — |
 
 ## Architecture
 
@@ -99,9 +95,9 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) → **Load seeded demo** → **Run Audience Test**. No paid keys required for the seeded path.
+Open [http://localhost:3000](http://localhost:3000) → **Load seeded demo** → **Run Audience Test**. No paid keys required for the seeded path. Click the Thunder logo anytime to reset to stage 1.
 
-## Testing evidence
+## Testing
 
 ```bash
 npm run lint
@@ -111,26 +107,38 @@ npm run build
 npm run test:e2e   # Playwright — forced seeded/fallback, no credit burn
 ```
 
-Default E2E sets `FORCE_SEEDED_DEMO=true` so fal / ElevenLabs / Firecrawl / n8n credits are not consumed.
-
 ## Honest limitations
 
 - Jury agents simulate segments from **imported comments**, not live humans
 - Scores are transparent formulas over factor ratings — not platform analytics
 - Cover / voice / n8n stay recovery until their keys/webhooks exist
-- Reel / video generation is **not** shipped (not smoke-tested against a fal video model)
+- No Instagram / TikTok / Reddit / Twitter native OAuth posting
 - Without OpenAI or fal language keys, runs are Seeded demo / Recovery fallback — never fake Live
 
 ## Deploy
 
-Render blueprint: [`render.yaml`](render.yaml) (health check `/api/health`). Connect [github.com/harshjoshi23/Thunder](https://github.com/harshjoshi23/Thunder).
+Render blueprint: [`render.yaml`](render.yaml) (health check `/api/health`). Connect [github.com/harshjoshi23/Thunder](https://github.com/harshjoshi23/Thunder). Set `OPENAI_API_KEY` (and optional `FAL_KEY`, etc.) in the Render dashboard — never commit secrets.
+
+Step-by-step: [docs/PRESENTATION_GUIDE.md](docs/PRESENTATION_GUIDE.md) · [docs/developer-setup.md](docs/developer-setup.md)
+
+## Submission materials
+
+| Asset | Path |
+|-------|------|
+| Pitch deck (PDF) | [docs/submission/Thunder_Pitch_Deck.pdf](docs/submission/Thunder_Pitch_Deck.pdf) |
+| Pitch deck (PPTX) | [docs/submission/Thunder_Pitch_Deck.pptx](docs/submission/Thunder_Pitch_Deck.pptx) |
+| Submission kit | [docs/submission/Thunder_Submission_Kit.pdf](docs/submission/Thunder_Submission_Kit.pdf) |
+| Logo | [docs/submission/Thunder_Logo.svg](docs/submission/Thunder_Logo.svg) |
+| Video script + ElevenLabs TTS | [docs/VIDEO_SCRIPT.md](docs/VIDEO_SCRIPT.md) |
+| How to present / portal checklist | [docs/PRESENTATION_GUIDE.md](docs/PRESENTATION_GUIDE.md) |
+| Sample carousel copy | [docs/samples/carousel-sample.md](docs/samples/carousel-sample.md) |
 
 ## Docs
 
-- [docs/developer-setup.md](docs/developer-setup.md) — env names, n8n import, scripts
-- [docs/demo-script.md](docs/demo-script.md)
-- [docs/judge-questions.md](docs/judge-questions.md)
-- [docs/EXPLAINER.md](docs/EXPLAINER.md)
+- [docs/EXPLAINER.md](docs/EXPLAINER.md) — simple English
+- [docs/judge-questions.md](docs/judge-questions.md) — honest Q&A
+- [docs/architecture.md](docs/architecture.md)
+- [docs/developer-setup.md](docs/developer-setup.md)
 
 ## License
 

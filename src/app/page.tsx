@@ -140,7 +140,13 @@ export default function HomePage() {
 
       <header className="relative border-b border-border bg-elevated/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-4 px-4 py-5 md:px-6 md:py-6">
-          <div className="flex items-start gap-3 md:gap-4">
+          <button
+            type="button"
+            onClick={resetDemo}
+            className="flex items-start gap-3 rounded-lg text-left outline-none ring-offset-background transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-accent md:gap-4"
+            aria-label="Thunder — return to home / stage 1"
+            data-testid="brand-home"
+          >
             <ThunderMark size={52} className="mt-1 ring-1 ring-border" />
             <div>
               <p
@@ -153,7 +159,7 @@ export default function HomePage() {
                 Test your post before your audience does.
               </p>
             </div>
-          </div>
+          </button>
           <div className="flex flex-col items-end gap-2">
             <div className="flex items-center gap-2">
               <ThemeToggle />

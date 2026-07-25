@@ -7,6 +7,7 @@ import { SEED_INPUT } from "@/lib/mock/seed-input";
 import { StageNav } from "@/components/shell/StageNav";
 import { ModeBadge } from "@/components/shell/ModeBadge";
 import { ThunderMark } from "@/components/shell/ThunderMark";
+import { ThemeToggle } from "@/components/shell/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { LoadingOrchestra } from "@/components/shared/LoadingOrchestra";
 import { AudienceDataStage } from "@/components/stages/AudienceDataStage";
@@ -72,7 +73,6 @@ export default function HomePage() {
       };
       setSourceMsg(data.message ?? null);
       if (data.markdown?.trim()) {
-        // Prefer extracting comment-like lines; fall back to full markdown
         const lines = data.markdown
           .split("\n")
           .map((l) => l.replace(/^[-*•]\s*/, "").trim())
@@ -133,23 +133,32 @@ export default function HomePage() {
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       <div className="pointer-events-none absolute inset-0 bg-wash" aria-hidden />
-      <div className="pointer-events-none absolute inset-0 bg-grain opacity-[0.35]" aria-hidden />
+      <div
+        className="pointer-events-none absolute inset-0 bg-grain opacity-[0.28] dark:opacity-[0.2]"
+        aria-hidden
+      />
 
-      <header className="relative border-b border-ink/10 bg-paper/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-4 px-4 py-6 md:px-6">
+      <header className="relative border-b border-border bg-elevated/80 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-4 px-4 py-5 md:px-6 md:py-6">
           <div className="flex items-start gap-3 md:gap-4">
-            <ThunderMark size={52} className="mt-1 shadow-sm ring-1 ring-ink/10" />
+            <ThunderMark size={52} className="mt-1 ring-1 ring-border" />
             <div>
-              <p className="font-display text-4xl tracking-tight text-ink md:text-5xl">
+              <p
+                className="font-display text-4xl tracking-tight text-primary md:text-5xl"
+                data-testid="brand-title"
+              >
                 Thunder
               </p>
-              <p className="mt-1 max-w-xl text-sm text-ink/65 md:text-base">
+              <p className="mt-1 max-w-xl text-sm text-secondary md:text-base">
                 Test your post before your audience does.
               </p>
             </div>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <ModeBadge mode={result?.mode} confidence={result?.confidence} />
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <ModeBadge mode={result?.mode} confidence={result?.confidence} />
+            </div>
             <Button type="button" variant="ghost" size="sm" onClick={resetDemo}>
               Reset demo
             </Button>
@@ -157,7 +166,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className="relative mx-auto max-w-6xl space-y-8 px-4 py-8 md:px-6">
+      <main className="relative mx-auto max-w-6xl space-y-7 px-4 py-7 md:px-6 md:py-8">
         <StageNav
           active={stage}
           unlockedThrough={unlockedThrough}
@@ -166,15 +175,18 @@ export default function HomePage() {
 
         {error ? (
           <div
-            className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-900"
+            className="rounded-lg border border-critical/30 bg-critical/10 px-4 py-3 text-sm text-critical"
             role="alert"
+            data-testid="error-banner"
           >
             {error}
           </div>
         ) : null}
 
         {running ? (
-          <LoadingOrchestra trace={result?.meta.executionTrace} />
+          <div data-testid="stage-running">
+            <LoadingOrchestra trace={result?.meta.executionTrace} />
+          </div>
         ) : null}
 
         {!running && stage === 1 ? (
@@ -199,28 +211,32 @@ export default function HomePage() {
         ) : null}
 
         {!running && result && stage === 2 ? (
-          <AudienceTwinStage result={result} />
+          <div data-testid="stage-twin">
+            <AudienceTwinStage result={result} />
+          </div>
         ) : null}
         {!running && result && stage === 3 ? (
-          <ReactionLabStage result={result} />
+          <div data-testid="stage-jury">
+            <ReactionLabStage result={result} />
+          </div>
         ) : null}
         {!running && result && stage === 4 ? (
-          <DiagnosticsStage result={result} />
+          <div data-testid="stage-diagnostics">
+            <DiagnosticsStage result={result} />
+          </div>
         ) : null}
         {!running && result && stage === 5 ? (
-          <CarouselStage result={result} />
+          <div data-testid="stage-carousel">
+            <CarouselStage result={result} />
+          </div>
         ) : null}
         {!running && result && stage === 6 ? (
-          <BeforeAfterStage result={result} />
+          <div data-testid="stage-before-after">
+            <BeforeAfterStage result={result} />
+          </div>
         ) : null}
 
-        {!running && !result && stage !== 1 ? (
-          <p className="text-sm text-ink/55">
-            Run an audience test to unlock later stages.
-          </p>
-        ) : null}
-
-        <footer className="border-t border-ink/10 pt-6 text-xs text-ink/45">
+        <footer className="border-t border-border pt-6 text-xs text-muted">
           Thunder runs a grounded scenario simulation based on patterns in the
           creator’s supplied audience data. It does not predict real humans
           perfectly, guarantee virality, or produce scientific view forecasts.

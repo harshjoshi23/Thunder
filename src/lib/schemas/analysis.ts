@@ -92,6 +92,63 @@ export const GuardrailFindingSchema = z.object({
 
 export type GuardrailFinding = z.infer<typeof GuardrailFindingSchema>;
 
+const GUARDRAIL_TYPES = new Set([
+  "exaggeration",
+  "missing_context",
+  "unsupported_claim",
+  "manipulative_wording",
+  "privacy_safety",
+  "misinterpretation",
+  "weak_evidence",
+]);
+
+function coerceGuardrails(raw: unknown): GuardrailFinding[] {
+  if (!Array.isArray(raw)) return [];
+  const out: GuardrailFinding[] = [];
+  for (const item of raw) {
+    if (typeof item === "string" && item.trim()) {
+      out.push({
+        type: "unsupported_claim",
+        severity: "medium",
+        finding: item.trim(),
+      });
+      continue;
+    }
+    if (!item || typeof item !== "object") continue;
+    const obj = item as Record<string, unknown>;
+    const typeRaw = String(obj.type ?? obj.kind ?? obj.category ?? "").trim();
+    const type = (
+      GUARDRAIL_TYPES.has(typeRaw)
+        ? typeRaw
+        : typeRaw
+          ? "unsupported_claim"
+          : null
+    ) as GuardrailFinding["type"] | null;
+    const finding = String(
+      obj.finding ?? obj.message ?? obj.text ?? obj.description ?? "",
+    ).trim();
+    const severityRaw = String(obj.severity ?? "medium").toLowerCase();
+    const severity: GuardrailFinding["severity"] =
+      severityRaw === "low" || severityRaw === "high" ? severityRaw : "medium";
+    if (!type || !finding) continue;
+    const related = Array.isArray(obj.relatedEvidenceIds)
+      ? obj.relatedEvidenceIds.filter((x): x is string => typeof x === "string")
+      : undefined;
+    out.push({
+      type,
+      severity,
+      finding,
+      ...(related && related.length > 0 ? { relatedEvidenceIds: related } : {}),
+    });
+  }
+  return out.slice(0, 8);
+}
+
+/** Coerce messy LLM guardrail shapes into valid findings (drop junk). */
+export const GuardrailsSchema = z
+  .unknown()
+  .transform((raw): GuardrailFinding[] => coerceGuardrails(raw));
+
 export const AudienceResearchSchema = z.object({
   segments: z.array(SegmentSchema).length(3),
 });
@@ -106,7 +163,7 @@ export type JurorOutput = z.infer<typeof JurorOutputSchema>;
 
 export const CriticOutputSchema = z.object({
   factors: FactorsSchema,
-  guardrails: z.array(GuardrailFindingSchema).max(8),
+  guardrails: GuardrailsSchema,
   strengths: z.array(z.string()).min(1).max(5),
   weaknesses: z.array(z.string()).min(1).max(5),
 });
@@ -117,7 +174,7 @@ export const Call1OutputSchema = z.object({
   segments: z.array(SegmentSchema).length(3),
   reactions: z.array(ReactionSchema).length(3),
   factors: FactorsSchema,
-  guardrails: z.array(GuardrailFindingSchema).max(8),
+  guardrails: GuardrailsSchema,
   strengths: z.array(z.string()).min(1).max(5),
   weaknesses: z.array(z.string()).min(1).max(5),
 });
@@ -214,7 +271,7 @@ export const AnalyzeResultSchema = z.object({
   reactions: z.array(ReactionSchema).length(3),
   factors: FactorsSchema,
   optimizedFactors: FactorsSchema,
-  guardrails: z.array(GuardrailFindingSchema),
+  guardrails: GuardrailsSchema,
   strengths: z.array(z.string()),
   weaknesses: z.array(z.string()),
   originalDiagnostics: DiagnosticsSchema,

@@ -9,10 +9,10 @@ export function AudienceTwinStage({ result }: { result: AnalyzeResult }) {
   return (
     <section className="animate-fade-in space-y-6">
       <div className="max-w-2xl">
-        <h2 className="font-display text-3xl tracking-tight text-ink md:text-4xl">
+        <h2 className="font-display text-3xl tracking-tight text-primary md:text-4xl">
           Audience Twin
         </h2>
-        <p className="mt-2 text-ink/65">
+        <p className="mt-2 text-secondary">
           Three differentiated segments grounded in your imported comments.
           Every evidence ID is validated against the source list.
         </p>
@@ -22,7 +22,7 @@ export function AudienceTwinStage({ result }: { result: AnalyzeResult }) {
         {result.segments.map((segment) => (
           <article
             key={segment.name}
-            className="flex flex-col rounded-xl border border-ink/10 bg-white/55 p-5 shadow-sm"
+            className="flex flex-col rounded-xl border border-border bg-elevated/80 p-5 shadow-sm"
           >
             <div className="mb-3 flex flex-wrap gap-2">
               <Badge tone="teal">{segment.expertiseLevel}</Badge>
@@ -30,27 +30,27 @@ export function AudienceTwinStage({ result }: { result: AnalyzeResult }) {
                 {segment.evidenceIds.length} evidence
               </Badge>
             </div>
-            <h3 className="font-display text-2xl text-ink">{segment.name}</h3>
-            <p className="mt-2 text-sm text-ink/70">{segment.description}</p>
+            <h3 className="font-display text-2xl text-primary">{segment.name}</h3>
+            <p className="mt-2 text-sm text-secondary">{segment.description}</p>
 
             <div className="mt-4 space-y-3 text-sm">
               <div>
-                <p className="font-medium text-ink">Needs</p>
-                <ul className="mt-1 list-disc space-y-1 pl-4 text-ink/70">
+                <p className="font-medium text-primary">Needs</p>
+                <ul className="mt-1 list-disc space-y-1 pl-4 text-secondary">
                   {segment.needs.map((n) => (
                     <li key={n}>{n}</li>
                   ))}
                 </ul>
               </div>
               <div>
-                <p className="font-medium text-ink">Frustrations</p>
-                <ul className="mt-1 list-disc space-y-1 pl-4 text-ink/70">
+                <p className="font-medium text-primary">Frustrations</p>
+                <ul className="mt-1 list-disc space-y-1 pl-4 text-secondary">
                   {segment.frustrations.map((n) => (
                     <li key={n}>{n}</li>
                   ))}
                 </ul>
               </div>
-              <p className="text-xs italic text-ink/50">
+              <p className="text-xs italic text-muted">
                 {segment.consistencyNote}
               </p>
             </div>

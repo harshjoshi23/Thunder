@@ -24,10 +24,10 @@ export function FormulaDisclosure({
       {open ? (
         <div
           className={cn(
-            "absolute left-0 top-full z-20 mt-2 w-72 rounded-md border border-ink/10 bg-paper p-3 text-xs text-ink/80 shadow-lg",
+            "absolute left-0 top-full z-20 mt-2 w-72 rounded-md border border-border bg-paper p-3 text-xs text-secondary shadow-lg",
           )}
         >
-          <p className="mb-1 font-medium text-ink">{label}</p>
+          <p className="mb-1 font-medium text-primary">{label}</p>
           <p className="font-mono leading-relaxed">{formula}</p>
         </div>
       ) : null}

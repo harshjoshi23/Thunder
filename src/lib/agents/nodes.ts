@@ -12,7 +12,8 @@ import {
   buildAnalyzeResultFromParts,
   getMockAnalyzeResult,
 } from "@/lib/mock/seed-result";
-import { hasFalKey, isFallbackEnabled, shouldForceMock } from "@/lib/fal/config";
+import { isFallbackEnabled, shouldForceMock } from "@/lib/fal/config";
+import { hasLiveLanguageKey } from "@/lib/llm/config";
 import type { Call1Output, Reaction, TraceStep } from "@/lib/schemas";
 import { runAudienceResearch } from "./audience";
 import { runJuror } from "./juror";
@@ -34,7 +35,7 @@ function shouldUseLive(state: ThunderGraphState): boolean {
   return (
     !state.forceMock &&
     !shouldForceMock() &&
-    hasFalKey() &&
+    hasLiveLanguageKey() &&
     state.comments.length > 0
   );
 }
@@ -65,7 +66,7 @@ export async function audienceResearchNode(
           "skip",
           state.forceMock || shouldForceMock()
             ? "seeded demo forced"
-            : "FAL_KEY missing or no comments",
+            : "OPENAI_API_KEY/FAL_KEY missing or no comments",
         ),
       ],
     };
@@ -244,8 +245,8 @@ export async function criticNode(
 ): Promise<Partial<ThunderGraphState>> {
   if (state.mode !== "live" || state.segments.length !== 3) {
     return {
-      agentTrace: ["critic skipped"],
-      executionTrace: [trace("critic", "skip")],
+      agentTrace: ["criticPass skipped"],
+      executionTrace: [trace("criticPass", "skip")],
     };
   }
 
@@ -290,9 +291,9 @@ export async function criticNode(
       call1: repaired,
       reactions,
       modelsUsed: { critic: model },
-      agentTrace: [`critic (${model})`],
+      agentTrace: [`criticPass (${model})`],
       executionTrace: [
-        trace("critic", "ok", undefined, model, Date.now() - t0),
+        trace("criticPass", "ok", undefined, model, Date.now() - t0),
       ],
     };
   } catch (err) {
@@ -300,9 +301,9 @@ export async function criticNode(
     return {
       mode: "recovery_fallback",
       error: message,
-      agentTrace: [`critic failed: ${message}`],
+      agentTrace: [`criticPass failed: ${message}`],
       executionTrace: [
-        trace("critic", "error", message, undefined, Date.now() - t0),
+        trace("criticPass", "error", message, undefined, Date.now() - t0),
       ],
     };
   }

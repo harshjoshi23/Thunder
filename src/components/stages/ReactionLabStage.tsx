@@ -33,10 +33,10 @@ export function ReactionLabStage({ result }: { result: AnalyzeResult }) {
   return (
     <section className="animate-fade-in space-y-6">
       <div className="max-w-2xl">
-        <h2 className="font-display text-3xl tracking-tight text-ink md:text-4xl">
+        <h2 className="font-display text-3xl tracking-tight text-primary md:text-4xl">
           Reaction Lab
         </h2>
-        <p className="mt-2 text-ink/65">
+        <p className="mt-2 text-secondary">
           Audience jury simulation. Disagreement is a feature — conflicting
           segment needs surface trade-offs before you publish.
         </p>
@@ -49,7 +49,7 @@ export function ReactionLabStage({ result }: { result: AnalyzeResult }) {
         </p>
       </div>
 
-      <div className="rounded-xl border border-teal-800/15 bg-ink px-4 py-3 text-sm text-paper shadow-sm">
+      <div className="rounded-xl border border-electric/25 bg-ink px-4 py-3 text-sm text-paper shadow-sm">
         <p className="text-xs font-medium uppercase tracking-wider text-teal-300">
           Thunderbolt
         </p>
@@ -62,10 +62,10 @@ export function ReactionLabStage({ result }: { result: AnalyzeResult }) {
         {result.reactions.map((reaction) => (
           <article
             key={reaction.segmentName}
-            className="rounded-xl border border-ink/10 bg-white/55 p-5 shadow-sm"
+            className="rounded-xl border border-border bg-elevated/80 p-5 shadow-sm"
           >
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <h3 className="font-display text-xl text-ink">
+              <h3 className="font-display text-xl text-primary">
                 {reaction.segmentName}
               </h3>
               <Badge tone={ACTION_TONE[reaction.likelyAction]}>
@@ -74,20 +74,20 @@ export function ReactionLabStage({ result }: { result: AnalyzeResult }) {
             </div>
             <dl className="space-y-3 text-sm">
               <div>
-                <dt className="font-medium text-ink">Understood</dt>
-                <dd className="text-ink/70">{reaction.understood}</dd>
+                <dt className="font-medium text-primary">Understood</dt>
+                <dd className="text-secondary">{reaction.understood}</dd>
               </div>
               <div>
-                <dt className="font-medium text-ink">Valued</dt>
-                <dd className="text-ink/70">{reaction.valued}</dd>
+                <dt className="font-medium text-primary">Valued</dt>
+                <dd className="text-secondary">{reaction.valued}</dd>
               </div>
               <div>
-                <dt className="font-medium text-ink">Challenged</dt>
-                <dd className="text-ink/70">{reaction.challenged}</dd>
+                <dt className="font-medium text-primary">Challenged</dt>
+                <dd className="text-secondary">{reaction.challenged}</dd>
               </div>
               <div>
-                <dt className="font-medium text-ink">Missing</dt>
-                <dd className="text-ink/70">{reaction.missingInfo}</dd>
+                <dt className="font-medium text-primary">Missing</dt>
+                <dd className="text-secondary">{reaction.missingInfo}</dd>
               </div>
             </dl>
           </article>

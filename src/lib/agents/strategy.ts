@@ -5,8 +5,7 @@ import {
   type Comment,
   type Diagnostics,
 } from "@/lib/schemas";
-import { falStructuredGenerate } from "@/lib/fal/lm";
-import { getFalStrategyModel } from "@/lib/fal/config";
+import { structuredGenerate } from "@/lib/llm/structured";
 import {
   buildStrategySystemPrompt,
   buildStrategyUserPrompt,
@@ -19,9 +18,8 @@ export async function runStrategy(args: {
   call1: Call1Output;
   diagnostics: Diagnostics;
 }): Promise<{ data: Call2Output; model: string }> {
-  const model = getFalStrategyModel();
-  const data = await falStructuredGenerate({
-    model,
+  const { data, model } = await structuredGenerate({
+    role: "strategy",
     system: buildStrategySystemPrompt(),
     prompt: buildStrategyUserPrompt({
       comments: args.comments,
@@ -32,7 +30,7 @@ export async function runStrategy(args: {
     }),
     schema: Call2OutputSchema,
     repairHint:
-      "Exactly 5 slides. Include voiceoverScript. Evidence IDs from comments only. Deltas −3..+3.",
+      "Flat JSON only: hook, slides[5], caption, cta, voiceoverScript, changeExplanations[], optimizedFactorDeltas (−3..+3 integers). Evidence IDs from comments only.",
   });
   return { data, model };
 }

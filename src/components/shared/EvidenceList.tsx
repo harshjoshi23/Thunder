@@ -14,7 +14,7 @@ export function EvidenceList({
       {evidenceIds.map((id) => (
         <li
           key={id}
-          className="rounded-md border border-ink/8 bg-white/50 p-2.5 text-sm text-ink/80"
+          className="rounded-md border border-border bg-elevated/70 p-2.5 text-sm text-secondary"
         >
           <Badge tone="teal" className="mb-1.5">
             {id}

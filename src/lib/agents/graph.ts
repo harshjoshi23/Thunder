@@ -2,11 +2,8 @@ import { END, START, StateGraph } from "@langchain/langgraph";
 import type { AnalyzeRequest, AnalyzeResult } from "@/lib/schemas";
 import { getAnalyzeTimeoutMs, withTimeout } from "@/lib/timeouts";
 import { getMockAnalyzeResult } from "@/lib/mock/seed-result";
-import {
-  hasFalKey,
-  isFallbackEnabled,
-  shouldForceMock,
-} from "@/lib/fal/config";
+import { isFallbackEnabled, shouldForceMock } from "@/lib/fal/config";
+import { hasLiveLanguageKey } from "@/lib/llm/config";
 import {
   audienceResearchNode,
   criticNode,
@@ -33,7 +30,7 @@ function buildGraph() {
     .addNode("juror1", juror1Node)
     .addNode("juror2", juror2Node)
     .addNode("juror3", juror3Node)
-    .addNode("critic", criticNode)
+    .addNode("criticPass", criticNode)
     .addNode("originalScoring", originalScoringNode)
     .addNode("strategy", strategyNode)
     .addNode("optimizedEval", optimizedEvalNode)
@@ -50,10 +47,10 @@ function buildGraph() {
     .addEdge("jurorFanout", "juror2")
     .addEdge("jurorFanout", "juror3")
     // Fan-in: critic waits for all three
-    .addEdge("juror1", "critic")
-    .addEdge("juror2", "critic")
-    .addEdge("juror3", "critic")
-    .addEdge("critic", "originalScoring")
+    .addEdge("juror1", "criticPass")
+    .addEdge("juror2", "criticPass")
+    .addEdge("juror3", "criticPass")
+    .addEdge("criticPass", "originalScoring")
     .addEdge("originalScoring", "strategy")
     .addEdge("strategy", "optimizedEval")
     .addEdge("optimizedEval", "finalVerify")
@@ -82,10 +79,10 @@ export async function runThunderAnalysis(
     );
   }
 
-  if (!hasFalKey()) {
+  if (!hasLiveLanguageKey()) {
     if (!isFallbackEnabled()) {
       throw new Error(
-        "FAL_KEY is required for live analysis (or set THUNDER_ENABLE_FALLBACK=true)",
+        "OPENAI_API_KEY or FAL_KEY is required for live analysis (or set THUNDER_ENABLE_FALLBACK=true)",
       );
     }
     return getMockAnalyzeResult(

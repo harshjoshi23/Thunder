@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { hasFalKey } from "@/lib/fal/config";
+import { hasOpenAiKey } from "@/lib/llm/config";
 
 export const runtime = "nodejs";
 
@@ -8,7 +9,13 @@ export async function GET() {
     ok: true,
     service: process.env.NEXT_PUBLIC_APP_NAME ?? "Thunder",
     time: new Date().toISOString(),
+    openaiConfigured: hasOpenAiKey(),
     falConfigured: hasFalKey(),
+    languagePath: hasOpenAiKey()
+      ? "openai"
+      : hasFalKey()
+        ? "fal"
+        : "none",
     firecrawlConfigured: Boolean(process.env.FIRECRAWL_API_KEY?.trim()),
     elevenLabsConfigured: Boolean(process.env.ELEVENLABS_API_KEY?.trim()),
     n8nConfigured: Boolean(process.env.N8N_WEBHOOK_URL?.trim()),

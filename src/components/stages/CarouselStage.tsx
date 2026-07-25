@@ -126,30 +126,37 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
   return (
     <section className="animate-fade-in space-y-6">
       <div className="max-w-2xl">
-        <h2 className="font-display text-3xl tracking-tight text-ink md:text-4xl">
+        <h2 className="font-display text-3xl tracking-tight text-primary md:text-4xl">
           Optimized Carousel
         </h2>
-        <p className="mt-2 text-ink/65">
+        <p className="mt-2 text-secondary">
           Content Strategy Agent resolved segment trade-offs into five slides,
           with evidence-linked change explanations and a voiceover script.
+        </p>
+        <p className="mt-2 text-xs text-muted">
+          Cover image is a visual asset only — it does not change diagnostic
+          scores. Requires <code className="text-electric">FAL_KEY</code>;
+          otherwise a branded fallback SVG is used.
         </p>
       </div>
 
       <TechnicalCredibilityPanel result={result} />
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-        <div className="space-y-3">
+        <div className="space-y-3" data-testid="cover-panel">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={coverUrl}
             alt="Carousel cover"
-            className="aspect-square w-full rounded-xl border border-ink/10 object-cover shadow-sm"
+            className="aspect-square w-full rounded-xl border border-border object-cover shadow-sm"
+            data-testid="cover-image"
           />
           <Button
             type="button"
             variant="secondary"
             onClick={generateCover}
             disabled={loadingCover}
+            data-testid="generate-cover"
           >
             {loadingCover ? "Generating…" : "Generate Cover"}
           </Button>
@@ -170,13 +177,13 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
             {exporting ? "Sending…" : "Approve & Send to n8n"}
           </Button>
           {coverMsg ? (
-            <p className="text-xs text-ink/55">{coverMsg}</p>
+            <p className="text-xs text-muted">{coverMsg}</p>
           ) : null}
           {voiceMsg ? (
-            <p className="text-xs text-ink/55">{voiceMsg}</p>
+            <p className="text-xs text-muted">{voiceMsg}</p>
           ) : null}
           {exportMsg ? (
-            <p className="text-xs text-ink/55">{exportMsg}</p>
+            <p className="text-xs text-muted">{exportMsg}</p>
           ) : null}
           {audioUrl ? (
             <audio controls src={audioUrl} className="w-full" />
@@ -184,11 +191,11 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
         </div>
 
         <div className="space-y-5">
-          <div className="rounded-xl border border-teal-800/15 bg-teal-800/5 p-5">
-            <p className="text-xs font-medium uppercase tracking-wider text-teal-900">
+          <div className="rounded-xl border border-electric/25 bg-electric-soft p-5">
+            <p className="text-xs font-medium uppercase tracking-wider text-electric">
               Hook
             </p>
-            <p className="mt-2 font-display text-2xl text-ink">
+            <p className="mt-2 font-display text-2xl text-primary">
               {result.optimized.hook}
             </p>
           </div>
@@ -197,48 +204,48 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
             {result.optimized.slides.map((slide, i) => (
               <article
                 key={slide.title}
-                className="rounded-xl border border-ink/10 bg-white/70 p-4 shadow-sm"
+                className="rounded-xl border border-border bg-elevated p-4 shadow-sm"
               >
                 <Badge tone="teal" className="mb-2">
                   Slide {i + 1}
                 </Badge>
-                <h3 className="font-display text-lg text-ink">{slide.title}</h3>
-                <p className="mt-2 text-sm text-ink/70">{slide.body}</p>
+                <h3 className="font-display text-lg text-primary">{slide.title}</h3>
+                <p className="mt-2 text-sm text-secondary">{slide.body}</p>
               </article>
             ))}
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-xl border border-ink/10 bg-white/55 p-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-ink/50">
+            <div className="rounded-xl border border-border bg-elevated/80 p-4">
+              <p className="text-xs font-medium uppercase tracking-wider text-muted">
                 Caption
               </p>
-              <p className="mt-2 text-sm text-ink/80">{result.optimized.caption}</p>
+              <p className="mt-2 text-sm text-secondary">{result.optimized.caption}</p>
             </div>
-            <div className="rounded-xl border border-ink/10 bg-white/55 p-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-ink/50">
+            <div className="rounded-xl border border-border bg-elevated/80 p-4">
+              <p className="text-xs font-medium uppercase tracking-wider text-muted">
                 CTA
               </p>
-              <p className="mt-2 text-sm text-ink/80">{result.optimized.cta}</p>
+              <p className="mt-2 text-sm text-secondary">{result.optimized.cta}</p>
             </div>
           </div>
 
-          <div className="rounded-xl border border-ink/10 bg-white/55 p-4">
-            <p className="text-xs font-medium uppercase tracking-wider text-ink/50">
+          <div className="rounded-xl border border-border bg-elevated/80 p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted">
               Voiceover script
             </p>
-            <p className="mt-2 whitespace-pre-wrap text-sm text-ink/80">
+            <p className="mt-2 whitespace-pre-wrap text-sm text-secondary">
               {result.optimized.voiceoverScript}
             </p>
           </div>
 
-          <div className="rounded-xl border border-ink/10 bg-white/55 p-4">
-            <h3 className="font-medium text-ink">Why it changed</h3>
+          <div className="rounded-xl border border-border bg-elevated/80 p-4">
+            <h3 className="font-medium text-primary">Why it changed</h3>
             <ul className="mt-3 space-y-3">
               {result.optimized.changeExplanations.map((item) => (
                 <li key={item.change} className="text-sm">
-                  <p className="font-medium text-ink">{item.change}</p>
-                  <p className="text-ink/70">{item.why}</p>
+                  <p className="font-medium text-primary">{item.change}</p>
+                  <p className="text-secondary">{item.why}</p>
                   {item.evidenceIds.length > 0 ? (
                     <Accordion title="Evidence">
                       <EvidenceList

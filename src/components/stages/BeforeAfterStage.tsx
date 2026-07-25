@@ -34,18 +34,18 @@ export function BeforeAfterStage({ result }: { result: AnalyzeResult }) {
   return (
     <section className="animate-fade-in space-y-6">
       <div className="max-w-2xl">
-        <h2 className="font-display text-3xl tracking-tight text-ink md:text-4xl">
+        <h2 className="font-display text-3xl tracking-tight text-primary md:text-4xl">
           Before vs After
         </h2>
-        <p className="mt-2 text-ink/65">
+        <p className="mt-2 text-secondary">
           Same deterministic formulas on original vs optimized factor ratings.
           No hard-coded vanity improvements.
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-ink/10 bg-white/60 shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-border bg-elevated/85 shadow-sm">
         <table className="w-full text-left text-sm">
-          <thead className="bg-ink text-paper">
+          <thead className="bg-primary text-background">
             <tr>
               <th className="px-4 py-3 font-medium">Diagnostic</th>
               <th className="px-4 py-3 font-medium">Original</th>
@@ -60,12 +60,12 @@ export function BeforeAfterStage({ result }: { result: AnalyzeResult }) {
               const delta = after - before;
               const good = row.invert ? delta < 0 : delta > 0;
               return (
-                <tr key={row.key} className="border-t border-ink/8">
-                  <td className="px-4 py-3 font-medium text-ink">{row.label}</td>
-                  <td className="px-4 py-3 text-ink/70">
+                <tr key={row.key} className="border-t border-border">
+                  <td className="px-4 py-3 font-medium text-primary">{row.label}</td>
+                  <td className="px-4 py-3 text-secondary">
                     <AnimatedValue value={before} />
                   </td>
-                  <td className="px-4 py-3 text-ink">
+                  <td className="px-4 py-3 text-primary">
                     <AnimatedValue value={after} />
                   </td>
                   <td
@@ -84,30 +84,30 @@ export function BeforeAfterStage({ result }: { result: AnalyzeResult }) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-xl border border-ink/10 bg-white/55 p-4">
-          <p className="text-xs uppercase tracking-wider text-ink/50">
+        <div className="rounded-xl border border-border bg-elevated/80 p-4">
+          <p className="text-xs uppercase tracking-wider text-muted">
             Relative performance
           </p>
-          <p className="mt-2 font-display text-2xl text-ink">
+          <p className="mt-2 font-display text-2xl text-primary">
             {result.meta.relativePerformance}
           </p>
         </div>
-        <div className="rounded-xl border border-ink/10 bg-white/55 p-4">
-          <p className="text-xs uppercase tracking-wider text-ink/50">
+        <div className="rounded-xl border border-border bg-elevated/80 p-4">
+          <p className="text-xs uppercase tracking-wider text-muted">
             Primary strength
           </p>
-          <p className="mt-2 text-sm text-ink/80">{result.meta.primaryStrength}</p>
+          <p className="mt-2 text-sm text-secondary">{result.meta.primaryStrength}</p>
         </div>
-        <div className="rounded-xl border border-ink/10 bg-white/55 p-4">
-          <p className="text-xs uppercase tracking-wider text-ink/50">
+        <div className="rounded-xl border border-border bg-elevated/80 p-4">
+          <p className="text-xs uppercase tracking-wider text-muted">
             Primary weakness addressed
           </p>
-          <p className="mt-2 text-sm text-ink/80">{result.meta.primaryWeakness}</p>
+          <p className="mt-2 text-sm text-secondary">{result.meta.primaryWeakness}</p>
         </div>
       </div>
 
-      <div className="rounded-xl border border-ink/10 bg-ink/[0.03] p-4 text-xs text-ink/55">
-        <p className="font-medium text-ink/70">Agent trace</p>
+      <div className="rounded-xl border border-border bg-muted-bg p-4 text-xs text-muted">
+        <p className="font-medium text-secondary">Agent trace</p>
         <p className="mt-1 font-mono">{result.meta.agentTrace.join(" → ")}</p>
       </div>
     </section>

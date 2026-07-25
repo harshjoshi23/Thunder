@@ -3,8 +3,7 @@ import {
   type AudienceResearch,
   type Comment,
 } from "@/lib/schemas";
-import { falStructuredGenerate } from "@/lib/fal/lm";
-import { getFalAudienceModel } from "@/lib/fal/config";
+import { structuredGenerate } from "@/lib/llm/structured";
 import {
   buildAudienceSystemPrompt,
   buildAudienceUserPrompt,
@@ -15,9 +14,8 @@ export async function runAudienceResearch(args: {
   creatorContext: string;
   draftPost: string;
 }): Promise<{ data: AudienceResearch; model: string }> {
-  const model = getFalAudienceModel();
-  const data = await falStructuredGenerate({
-    model,
+  const { data, model } = await structuredGenerate({
+    role: "audience",
     system: buildAudienceSystemPrompt(),
     prompt: buildAudienceUserPrompt(args),
     schema: AudienceResearchSchema,

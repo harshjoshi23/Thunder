@@ -25,7 +25,8 @@ flowchart TB
   end
 
   subgraph external [External]
-    FalLM["fal-ai/any-llm"]
+    OpenAI[OpenAI_preferred]
+    FalLM["fal-ai/any-llm_fallback"]
     FalImg["fal-ai/flux/dev"]
     Firecrawl[Firecrawl]
     Eleven[ElevenLabs]
@@ -39,7 +40,8 @@ flowchart TB
   UI --> API_V
   UI --> API_E
   API_A --> Graph
-  Graph -->|structured JSON| FalLM
+  Graph -->|OPENAI_API_KEY| OpenAI
+  Graph -->|else FAL_KEY| FalLM
   Graph --> Evidence
   Graph --> Score
   Graph -.->|no key or error| Fallback
@@ -55,18 +57,18 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-  N[normalizeComments] --> A[audienceResearch_fal]
+  N[normalizeComments] --> A[audienceResearch]
   A --> E[evidenceValidate]
   E -->|retry once| A
   E --> F[jurorFanout]
   F --> J1[juror1]
   F --> J2[juror2]
   F --> J3[juror3]
-  J1 --> C[critic_fal]
+  J1 --> C[critic]
   J2 --> C
   J3 --> C
   C --> S[originalScoring_TS]
-  S --> ST[strategy_fal_voiceover]
+  S --> ST[strategy_voiceover]
   ST --> O[optimizedEval_TS]
   O --> V[finalVerify]
   A -.->|fail| M[recovery_fallback]
@@ -74,15 +76,25 @@ flowchart TB
   M --> V
 ```
 
+## Language path
+
+| Priority | Condition | Label |
+|----------|-----------|-------|
+| 1 | `OPENAI_API_KEY` | Live (OpenAI) |
+| 2 | else `FAL_KEY` | Live (fal any-llm) |
+| 3 | else / error + fallback | Seeded demo / Recovery fallback |
+
+Cover images always use fal Flux when `FAL_KEY` is set.
+
 ## Model IDs
 
-| Node | Model |
-|------|-------|
-| Audience | `google/gemini-2.5-flash-lite` via `fal-ai/any-llm` |
-| Jurors | `google/gemini-2.5-flash` |
-| Critic | `anthropic/claude-3-5-haiku` |
-| Strategy | `google/gemini-2.5-flash` |
-| Cover | `fal-ai/flux/dev` |
+| Node | OpenAI default | fal fallback |
+|------|----------------|--------------|
+| Audience | `gpt-4o-mini` | `google/gemini-2.5-flash-lite` |
+| Jurors | `gpt-4o-mini` | `google/gemini-2.5-flash` |
+| Critic | `gpt-4o-mini` | `anthropic/claude-3-5-haiku` |
+| Strategy | `gpt-4o-mini` | `google/gemini-2.5-flash` |
+| Cover | — | `fal-ai/flux/dev` |
 
 ## UI stage map
 

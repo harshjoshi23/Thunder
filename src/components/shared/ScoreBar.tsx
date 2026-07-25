@@ -26,9 +26,9 @@ export function ScoreBar({
         ? "bg-amber-600"
         : value >= 40
           ? "bg-amber-500"
-          : "bg-teal-700"
+          : "bg-electric"
       : value >= 70
-        ? "bg-teal-700"
+        ? "bg-electric"
         : value >= 45
           ? "bg-amber-500"
           : "bg-ink/40";
@@ -36,19 +36,19 @@ export function ScoreBar({
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-sm font-medium text-ink">{label}</span>
-        <span className="font-mono text-sm tabular-nums text-ink/80">
+        <span className="text-sm font-medium text-primary">{label}</span>
+        <span className="font-mono text-sm tabular-nums text-secondary">
           {value}
         </span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-ink/10">
+      <div className="h-2 overflow-hidden rounded-full bg-muted-bg">
         <div
           className={cn("h-full rounded-full transition-all duration-700", tone)}
           style={{ width: `${width}%` }}
         />
       </div>
       {formula ? (
-        <p className="font-mono text-[10px] text-ink/45">{formula}</p>
+        <p className="font-mono text-[10px] text-muted">{formula}</p>
       ) : null}
     </div>
   );

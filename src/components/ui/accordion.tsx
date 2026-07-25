@@ -15,22 +15,22 @@ export function Accordion({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border-t border-ink/10">
+    <div className="border-t border-border">
       <button
         type="button"
-        className="flex w-full items-center justify-between gap-3 py-3 text-left text-sm font-medium text-ink"
+        className="flex w-full items-center justify-between gap-3 py-3 text-left text-sm font-medium text-primary"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
       >
         {title}
         <ChevronDown
           className={cn(
-            "h-4 w-4 shrink-0 text-ink/50 transition",
+            "h-4 w-4 shrink-0 text-muted transition",
             open && "rotate-180",
           )}
         />
       </button>
-      {open ? <div className="pb-3 text-sm text-ink/75">{children}</div> : null}
+      {open ? <div className="pb-3 text-sm text-secondary">{children}</div> : null}
     </div>
   );
 }

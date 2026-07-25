@@ -5,8 +5,7 @@ import {
   type Reaction,
   type Segment,
 } from "@/lib/schemas";
-import { falStructuredGenerate } from "@/lib/fal/lm";
-import { getFalCriticModel } from "@/lib/fal/config";
+import { structuredGenerate } from "@/lib/llm/structured";
 import { buildCriticSystemPrompt, buildCriticUserPrompt } from "./prompts";
 
 export async function runCritic(args: {
@@ -16,9 +15,8 @@ export async function runCritic(args: {
   segments: Segment[];
   reactions: Reaction[];
 }): Promise<{ data: CriticOutput; model: string }> {
-  const model = getFalCriticModel();
-  const data = await falStructuredGenerate({
-    model,
+  const { data, model } = await structuredGenerate({
+    role: "critic",
     system: buildCriticSystemPrompt(),
     prompt: buildCriticUserPrompt({
       comments: args.comments,
@@ -28,7 +26,8 @@ export async function runCritic(args: {
       reactionsJson: JSON.stringify(args.reactions),
     }),
     schema: CriticOutputSchema,
-    repairHint: "Factors must be integers 0–10. Use only provided Cxx IDs.",
+    repairHint:
+      'guardrails must be objects like {"type":"exaggeration","severity":"high","finding":"..."}. Factors integers 0–10. Use only provided Cxx IDs.',
   });
-  return { data, model };
+  return { data: data as CriticOutput, model };
 }

@@ -10,12 +10,12 @@ export function Textarea({ className, label, id, ...props }: TextareaProps) {
   return (
     <label className="flex w-full flex-col gap-2">
       {label ? (
-        <span className="text-sm font-medium text-ink/80">{label}</span>
+        <span className="text-sm font-medium text-secondary">{label}</span>
       ) : null}
       <textarea
         id={textareaId}
         className={cn(
-          "min-h-28 w-full resize-y rounded-md border border-ink/15 bg-white/70 px-3 py-2 text-sm text-ink shadow-sm outline-none transition placeholder:text-ink/35 focus:border-teal-700 focus:ring-2 focus:ring-teal-700/20",
+          "min-h-28 w-full resize-y rounded-md border border-border bg-elevated px-3 py-2 text-sm text-primary shadow-sm outline-none transition placeholder:text-muted focus:border-electric focus:ring-2 focus:ring-electric/20",
           className,
         )}
         {...props}

@@ -2,132 +2,134 @@
 
 **Test your post before your audience does.**
 
-Thunder is a **scenario-testing** product: audience twin + multi-agent jury + deterministic before/after scoring. It turns historical comments into an evidence-backed audience twin, runs a LangGraph rehearsal on **fal.ai** language models, scores drafts with transparent TypeScript formulas, and produces an improved five-slide carousel (optional cover, voiceover, n8n handoff).
+Thunder is a pre-publication **scenario lab** for creators: turn historical comments into an evidence-backed audience twin, run a multi-agent jury rehearsal, score the draft with transparent TypeScript formulas, and ship an improved five-slide carousel — with modes labeled honestly as **Live**, **Seeded demo**, or **Recovery fallback**.
 
-> Thunder runs a grounded scenario simulation based on patterns in the creator’s supplied audience data. It does **not** predict real humans perfectly, guarantee virality, or forecast exact views.
+> Grounded simulation from *your* imported comments. Not a view predictor. Not a virality guarantee.
 
-## Stack
+## Problem
 
-- Next.js 15 (App Router) + TypeScript + Tailwind
-- Zod contracts on every AI/API boundary
-- LangGraph.js orchestration: normalize → audience (fal) → evidence → **3 parallel jurors** → critic → TS scoring → strategy (+ voiceoverScript) → optimized eval → final verify
-- **fal.ai** via `fal-ai/any-llm` + `fal-ai/flux/dev` (not direct OpenAI as default)
-- Honest modes: **Live** / **Seeded demo** / **Recovery fallback** (never silent fake-live)
-- Optional Firecrawl source URL, ElevenLabs voiceover, n8n webhook export
+Creators publish into silence or backlash because they only learn audience reaction *after* posting. Gut-check edits miss segment disagreements, weak evidence, and overclaim.
 
-## Model IDs (fal catalog)
+## Solution
 
-| Role | Env | Default ID |
-|------|-----|------------|
-| Text endpoint | `FAL_TEXT_ENDPOINT` | `fal-ai/any-llm` |
-| Audience research | `FAL_AUDIENCE_MODEL` | `google/gemini-2.5-flash-lite` |
-| Jurors (×3 parallel) | `FAL_JUROR_MODEL` | `google/gemini-2.5-flash` |
-| Critic | `FAL_CRITIC_MODEL` | `anthropic/claude-3-5-haiku` |
-| Strategy | `FAL_STRATEGY_MODEL` | `google/gemini-2.5-flash` |
-| Cover image | `FAL_IMAGE_MODEL` | `fal-ai/flux/dev` |
-| Voice | `ELEVENLABS_MODEL_ID` | `eleven_multilingual_v2` |
+1. Import historical comments + draft
+2. Build a three-segment audience twin grounded in comment evidence IDs
+3. Run three parallel juror personas + an adversarial critic
+4. Score original vs optimized drafts with deterministic formulas
+5. Export carousel (optional cover / voiceover / n8n handoff)
 
-## Quick start
+## Product surface (6 stages)
 
-```bash
-cp .env.example .env.local
-# paste keys later — leave placeholders empty for Seeded demo / Recovery fallback
-npm install
-npm run dev
+| Stage | What you see |
+|-------|----------------|
+| Audience Data | Comments → context → draft → optional source → **Run** |
+| Audience Twin | Three evidence-linked segments |
+| Reaction Lab | Disagreement across segments |
+| Diagnostics | Deterministic scores + guardrails |
+| Carousel | Optimized slides + optional cover/voice/n8n |
+| Before / After | Score deltas + credibility panel |
+
+## Jury & evidence
+
+- Evidence IDs (`C01`…) come only from imported comments
+- Invalid IDs are repaired or trigger a controlled retry — never invented as live truth
+- Live language path prefers **OpenAI** when `OPENAI_API_KEY` is set; otherwise **fal.ai** `any-llm` when `FAL_KEY` is set
+- Cover images use **fal.ai** Flux when `FAL_KEY` is set (visual only — does not affect scores)
+- Without a live language key: labeled Seeded demo / Recovery fallback
+
+## Agents (LangGraph)
+
+```
+normalize → audience → evidence → juror×3 (parallel) → critic
+  → TS scoring → strategy (+ voiceoverScript) → optimized eval → verify
 ```
 
-Open [http://localhost:3000](http://localhost:3000), click **Load seeded demo**, then **Run Audience Test**.
+## Before / after
 
-## Keys you must paste (hackathon credits)
+Diagnostics (clarity, specificity, audience fit, confidence) are computed in TypeScript from factor ratings. Strategy proposes bounded deltas; optimized scores are recomputed — not invented by the LLM.
 
-| Key | Where | Notes |
-|-----|-------|-------|
-| `FAL_KEY` | [fal.ai dashboard](https://fal.ai/dashboard/keys) | Required for **Live** analysis + covers |
-| `FIRECRAWL_API_KEY` | [firecrawl.dev](https://www.firecrawl.dev/) | Optional source URL scrape |
-| `ELEVENLABS_API_KEY` + `ELEVENLABS_VOICE_ID` | [elevenlabs.io](https://elevenlabs.io/) | Optional voiceover; Discord coupon may apply |
-| `N8N_WEBHOOK_URL` | n8n Cloud webhook (see below) | Optional Approve & Send |
-| `NEXT_PUBLIC_APP_URL` | Your Render URL | After deploy |
+## Sponsors / integrations actually used
 
-Leave unused keys blank. `THUNDER_ENABLE_FALLBACK=true` keeps the demo working with a clearly labeled **Recovery fallback**.
+| Integration | Role | Status |
+|-------------|------|--------|
+| OpenAI | Live audience / jurors / critic / strategy | Live when key present |
+| fal.ai | Optional LM fallback + cover image | Cover needs `FAL_KEY` |
+| Firecrawl | Optional source URL scrape | Optional |
+| ElevenLabs | Optional voiceover audio | Optional |
+| n8n | Approve & send webhook | Optional |
+| Cursor | Build environment | Used |
 
-## n8n import
+## Screenshots
 
-1. Open n8n Cloud → **Workflows** → **Import from File**
-2. Import [`n8n/thunder-approved-content.workflow.json`](n8n/thunder-approved-content.workflow.json)
-3. Open **Webhook** node → copy **Production** URL
-4. Paste into `.env.local` as `N8N_WEBHOOK_URL=…`
-5. Activate the workflow
-6. In Thunder carousel stage → **Approve & Send to n8n**
+Playwright captures light/dark × desktop/mobile samples under [`docs/samples/screenshots/`](docs/samples/screenshots/).
 
-API: `POST /api/export/n8n`
-
-## Scripts
-
-```bash
-npm run dev
-npm run lint
-npm run typecheck
-npm test
-npm run build
-```
-
-## Demo path (~2 minutes)
-
-1. Load seeded demo (consistency / hustle draft with weak absolutes)
-2. Run Audience Test → badge shows Seeded demo or Live / Recovery fallback
-3. Audience Twin → 3 evidence-backed segments
-4. Reaction Lab → disagreement across segments
-5. Diagnostics → deterministic scores + guardrails
-6. Optimized carousel → Generate Cover / Voiceover / Approve & Send to n8n
-7. Before / After score table + technical credibility panel
+| Flow | Light desktop | Dark mobile |
+|------|---------------|-------------|
+| Input | ![input-light-desktop](docs/samples/screenshots/input-light-desktop.png) | ![input-dark-mobile](docs/samples/screenshots/input-dark-mobile.png) |
+| Running | ![running-light-desktop](docs/samples/screenshots/running-light-desktop.png) | — |
+| Twin | ![twin-light-desktop](docs/samples/screenshots/twin-light-desktop.png) | — |
+| Jury | ![jury-light-desktop](docs/samples/screenshots/jury-light-desktop.png) | — |
+| Diagnostics | ![diagnostics-light-desktop](docs/samples/screenshots/diagnostics-light-desktop.png) | — |
+| Carousel | ![carousel-light-desktop](docs/samples/screenshots/carousel-light-desktop.png) | — |
+| Before/After | ![before-after-light-desktop](docs/samples/screenshots/before-after-light-desktop.png) | — |
 
 ## Architecture
 
 ```mermaid
 flowchart TB
-  Browser --> Next[Next.js_on_Render]
-  Next --> RH[Route_Handlers]
-  RH --> LG[LangGraph]
-  LG --> FalLM[fal-ai/any-llm]
+  Browser --> Next[Next.js]
+  Next --> Analyze["/api/analyze"]
+  Analyze --> LG[LangGraph]
+  LG --> OpenAI[OpenAI_preferred]
+  LG --> FalLM[fal_any-llm_fallback]
   LG --> Score[Deterministic_TS_scoring]
-  RH --> FalImg[fal-ai/flux/dev]
-  RH --> Eleven[ElevenLabs]
-  RH --> N8N[n8n_webhook]
-  RH -.-> Firecrawl[Firecrawl_optional]
+  Next --> FalImg[fal_flux_cover]
+  Next --> Eleven[ElevenLabs_optional]
+  Next --> N8N[n8n_webhook_optional]
+  Next -.-> Firecrawl[Firecrawl_optional]
 ```
 
-See [docs/architecture.md](docs/architecture.md) for full Mermaid (importable into diagrams.net).
+Details: [docs/architecture.md](docs/architecture.md) · setup: [docs/developer-setup.md](docs/developer-setup.md)
 
-## Deploy (Render)
-
-1. Connect `https://github.com/harshjoshi23/Thunder.git` in Render
-2. Use `render.yaml` (Frankfurt, health check `/api/health`)
-3. Paste env vars from `.env.example` (especially `FAL_KEY`)
-4. Deploy — live URL appears in the Render dashboard
+## Quick start (seeded demo)
 
 ```bash
-# local check
-curl https://YOUR-APP.onrender.com/api/health
+cp .env.example .env.local
+npm install
+npm run dev
 ```
 
-## Future (not in hackathon scope)
+Open [http://localhost:3000](http://localhost:3000) → **Load seeded demo** → **Run Audience Test**. No paid keys required for the seeded path.
 
-- Redis / Kafka fan-out for multi-tenant scale — document only; not implemented
-- Social auto-post — intentionally out of scope (n8n receives approved payloads only)
+## Testing evidence
+
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npm run test:e2e   # Playwright — forced seeded/fallback, no credit burn
+```
+
+Default E2E sets `FORCE_SEEDED_DEMO=true` so fal / ElevenLabs / Firecrawl / n8n credits are not consumed.
 
 ## Honest limitations
 
 - Jury agents simulate segments from **imported comments**, not live humans
-- Scores are transparent formulas over LLM factor ratings — not platform analytics
-- Without `FAL_KEY`, runs are **Seeded demo** or **Recovery fallback**, never fake Live
-- Firecrawl / ElevenLabs / n8n are optional; missing keys degrade with labeled recovery
+- Scores are transparent formulas over factor ratings — not platform analytics
+- Cover / voice / n8n stay recovery until their keys/webhooks exist
+- Reel / video generation is **not** shipped (not smoke-tested against a fal video model)
+- Without OpenAI or fal language keys, runs are Seeded demo / Recovery fallback — never fake Live
+
+## Deploy
+
+Render blueprint: [`render.yaml`](render.yaml) (health check `/api/health`). Connect [github.com/harshjoshi23/Thunder](https://github.com/harshjoshi23/Thunder).
 
 ## Docs
 
+- [docs/developer-setup.md](docs/developer-setup.md) — env names, n8n import, scripts
 - [docs/demo-script.md](docs/demo-script.md)
 - [docs/judge-questions.md](docs/judge-questions.md)
-- [docs/architecture.md](docs/architecture.md)
-- [docs/render-n8n-guide.md](docs/render-n8n-guide.md)
 - [docs/EXPLAINER.md](docs/EXPLAINER.md)
 
 ## License

@@ -6,6 +6,9 @@ Thunder is a pre-publication **scenario lab** for creators: turn historical comm
 
 > Grounded simulation from *your* imported comments. Not a view predictor. Not a virality guarantee. No login.
 
+**Live demo:** [https://thunder-psio.onrender.com](https://thunder-psio.onrender.com)  
+(Cold start on Render free tier can take ~30–60s. Use **Load seeded demo** → **Run Audience Test**.)
+
 ![Thunder Audience Data](docs/images/01-audience-data.png)
 
 ## Problem
@@ -117,7 +120,9 @@ npm run test:e2e   # Playwright — forced seeded/fallback, no credit burn
 
 ## Deploy
 
-Render blueprint: [`render.yaml`](render.yaml) (health check `/api/health`). Connect [github.com/harshjoshi23/Thunder](https://github.com/harshjoshi23/Thunder). Set `OPENAI_API_KEY` (and optional `FAL_KEY`, etc.) in the Render dashboard — never commit secrets.
+**Production:** [https://thunder-psio.onrender.com](https://thunder-psio.onrender.com)
+
+Render blueprint: [`render.yaml`](render.yaml) (health check `/api/health`). Repo: [github.com/harshjoshi23/Thunder](https://github.com/harshjoshi23/Thunder). Set `OPENAI_API_KEY` and `NEXT_PUBLIC_APP_URL=https://thunder-psio.onrender.com` (plus optional `FAL_KEY`, etc.) in the Render dashboard — never commit secrets.
 
 Step-by-step: [docs/developer-setup.md](docs/developer-setup.md)
 

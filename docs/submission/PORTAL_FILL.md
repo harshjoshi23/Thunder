@@ -52,13 +52,21 @@ https://github.com/harshjoshi23/Thunder
 
 ## Live demo URL (optional)
 
-**Leave blank.** No public demo URL found. Do not paste `localhost`, LAN/`172.x`, or invented `onrender.com` hosts.
+**Honest status:** Live demo is **NOT submitted** until a public `https://….onrender.com` URL exists. Do **not** paste `localhost`, LAN/`172.x`, or invented hosts.
 
-(After you deploy via `render.yaml` on Render, paste the real `https://….onrender.com` URL here and in the portal.)
+**ASAP Render deploy (~10 min) — 5 steps**
+
+1. Open [dashboard.render.com](https://dashboard.render.com) → **New** → **Blueprint** → connect GitHub `harshjoshi23/Thunder` (uses root `render.yaml`).
+2. Confirm service **thunder** (Node web: `npm install && npm run build`, start `npm run start`, health `/api/health`).
+3. Set env secrets: **required** `OPENAI_API_KEY`; optional `FAL_KEY`, `ELEVENLABS_API_KEY`, `FIRECRAWL_API_KEY`, n8n keys. Keep model defaults from the blueprint.
+4. Deploy → wait green → open the service URL → check `/` and `/api/health`. Then set `NEXT_PUBLIC_APP_URL` to that exact `https://….onrender.com` and **Manual Deploy** once more.
+5. Paste that HTTPS URL into the portal Live demo field (and replace the placeholder below). Until then leave blank.
 
 ```
 (leave blank)
 ```
+
+**Portal paste once live:** only the Render HTTPS URL (e.g. `https://thunder-xxxx.onrender.com`).
 
 ---
 

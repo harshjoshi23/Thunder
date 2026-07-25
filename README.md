@@ -70,9 +70,13 @@ Without an OpenAI key, the full UI still works in **Demo / fallback mode**.
 
 - [docs/EXPLAINER.md](docs/EXPLAINER.md) — what we built, in simple English
 - [docs/SPEAKER.md](docs/SPEAKER.md) — what to say out loud
+- [docs/STATUS_SUMMARY.md](docs/STATUS_SUMMARY.md) — done / not done / API keys
+- [docs/prompts/PHASE_01_UX_POLISH.md](docs/prompts/PHASE_01_UX_POLISH.md) — next Cursor polish prompt
 - [docs/render-n8n-guide.md](docs/render-n8n-guide.md) — deploy + n8n for beginners
 - [docs/architecture.md](docs/architecture.md) — Mermaid diagrams
 - [docs/submission.md](docs/submission.md) — portal checklist
+
+> Screenshots of the UI for the README: add later under `docs/samples/` after the polish phase.
 
 ## License
 

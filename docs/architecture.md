@@ -1,94 +1,95 @@
-# Thunder Architecture
+# Thunder architecture (presentation-grade)
 
-Import any Mermaid block into [diagrams.net](https://app.diagrams.net): **Arrange → Insert → Advanced → Mermaid**.
+Import into [diagrams.net](https://app.diagrams.net): **Arrange → Insert → Advanced → Mermaid**.
 
-## Multi-agent decision
-
-Thunder uses a **controlled multi-agent LangGraph**, not a single mega-prompt and not an uncontrolled swarm.
-
-| Logical agent | Node | LLM? |
-|---------------|------|------|
-| Audience Research | part of Call 1 | Yes |
-| Scenario Simulation | part of Call 1 | Yes |
-| Adversarial Critic | part of Call 1 | Yes |
-| Deterministic scoring | `scoreDiagnostics` | No |
-| Evidence verification | `verifyEvidence` | No |
-| Content Strategy | Call 2 `optimizeCarousel` | Yes |
-| Finalize | `finalize` | No |
-
-Exactly **2** OpenAI structured calls per live analysis (+ at most one Call 1 retry).
-
-## Data flow
-
-```mermaid
-flowchart LR
-  UI[Browser_Workspace] -->|POST_JSON| API["/api/analyze"]
-  API --> Graph[LangGraph_Thunder]
-  Graph -->|Call1_structured| OAI1[OpenAI]
-  Graph --> Det[Score_Verify]
-  Graph -->|Call2_structured| OAI2[OpenAI]
-  Graph -->|AnalyzeResult| API
-  API -->|JSON_or_fallback| UI
-  UI -->|optional| Cover["/api/cover"]
-```
-
-## Graph topology
-
-```mermaid
-flowchart TD
-  start([START]) --> normalize[normalizeComments_DET]
-  normalize --> call1[analyzeAudienceAndDraft_LLM]
-  call1 --> verify1[verifyEvidence_DET]
-  verify1 -->|invalid_and_retries_lt_1| call1
-  verify1 -->|ok_or_repaired| score[scoreDiagnostics_DET]
-  score --> call2[optimizeCarousel_LLM]
-  call2 --> verify2[finalize_DET]
-  verify2 -->|fail_or_no_key| mock[loadMockFallback_DET]
-  verify2 -->|ok| endNode([END])
-  mock --> endNode
-  call1 -->|timeout_or_no_key| mock
-```
-
-## Component view
+## System context
 
 ```mermaid
 flowchart TB
-  subgraph client [Client]
-    Page[app/page.tsx]
-    Stages[components/stages]
+  subgraph creator [Creator]
+    Browser[Browser_Workspace]
   end
-  subgraph server [Server]
-    Analyze[api/analyze]
-    Cover[api/cover]
-    GraphMod[lib/agents/graph]
-    Schemas[lib/schemas]
-    Score[lib/scoring]
-    Mock[lib/mock]
+
+  subgraph thunderApp [Thunder_on_Render_or_Vercel]
+    UI[Nextjs_UI_6_Stages]
+    API_A["/api/analyze"]
+    API_C["/api/cover"]
+    API_E["/api/export"]
+    Graph[LangGraph_MultiAgent]
+    Score[Deterministic_Scoring_TS]
+    Evidence[Evidence_Validator]
+    Mock[Mock_Fallback]
   end
-  Page --> Stages
-  Page --> Analyze
-  Analyze --> GraphMod
-  GraphMod --> Schemas
-  GraphMod --> Score
-  GraphMod --> Mock
-  Stages -.-> Cover
+
+  subgraph external [External_optional]
+    OpenAI[OpenAI_API]
+    Fal[fal.ai]
+    N8N[n8n_Webhook]
+  end
+
+  Browser --> UI
+  UI --> API_A
+  UI --> API_C
+  UI --> API_E
+  API_A --> Graph
+  Graph -->|structured_Call1_Call2| OpenAI
+  Graph --> Evidence
+  Graph --> Score
+  Graph -.->|no_key_or_error| Mock
+  API_C -.-> Fal
+  API_E -.-> N8N
+  Mock --> UI
+  Score --> UI
 ```
 
-## Scoring (deterministic)
+## Agent graph (what “real agents” means)
 
-Factors are integers 0–10 from the LLM. Final diagnostics are computed in TypeScript:
+```mermaid
+flowchart LR
+  N[normalizeComments] --> A[Call1_Research_Simulate_Critic]
+  A --> V[verifyEvidence]
+  V -->|retry_once| A
+  V --> S[scoreDiagnostics]
+  S --> C[Call2_ContentStrategy]
+  C --> F[finalize]
+  A -.->|fail| M[mockFallback]
+  C -.->|fail| M
+  M --> F
+```
 
-- audienceFit = 0.35×segmentRelevance + 0.25×practicalUsefulness + 0.20×evidenceSupport + 0.20×hookStrength
-- clarity = 0.30×readability + 0.25×specificity + 0.25×structure + 0.20×(10−missingContext)
-- savePotential = 0.30×practicalUsefulness + 0.25×specificity + 0.25×novelty + 0.20×hookStrength
-- discussionPotential = 0.35×questionPotential + 0.25×controversyRisk + 0.20×novelty + 0.20×segmentRelevance
-- misinterpretationRisk = 0.30×ambiguity + 0.30×exaggeration + 0.20×missingContext + 0.20×controversyRisk
+## UI stage map
 
-Optimized scores apply Call 2 factor deltas (±3) then re-run the same formulas.
+```mermaid
+flowchart LR
+  S1[1_AudienceData] --> S2[2_AudienceTwin]
+  S2 --> S3[3_ReactionLab]
+  S3 --> S4[4_Diagnostics]
+  S4 --> S5[5_Carousel]
+  S5 --> S6[6_BeforeAfter]
+```
 
-## Evidence integrity
+## Data honesty
 
-1. Comments normalized to `C01…Cn`
-2. Model may only cite those IDs
-3. `verifyEvidence` strips invalid IDs / retries once if fabrication is severe
-4. UI never shows fabricated evidence silently
+```mermaid
+flowchart TB
+  Comments[Imported_comments_C01_Cn] --> Twin[3_Segments]
+  Twin --> Jury[Segment_Reactions]
+  Draft[Draft_text] --> Jury
+  Jury --> Factors[Factors_0_to_10]
+  Factors --> Formulas[TS_Formulas_0_to_100]
+  Formulas --> BA[Before_vs_After]
+  Twin --> Strategy[5_Slides]
+  Formulas --> Strategy
+```
+
+## Scaling note (pitch only — not built)
+
+For a hackathon demo, one Node process on Render is enough.
+
+**If** Thunder grew to many concurrent analyses later:
+
+- Queue long LLM jobs (e.g. Redis/BullMQ) so HTTP requests don’t time out
+- Keep scoring/evidence in-process (CPU-cheap)
+- Kafka-style brokers are unnecessary until you have event fan-out across many services
+
+Do not build this for the submission.

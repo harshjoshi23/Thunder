@@ -119,18 +119,17 @@ npm run test:e2e   # Playwright — forced seeded/fallback, no credit burn
 
 Render blueprint: [`render.yaml`](render.yaml) (health check `/api/health`). Connect [github.com/harshjoshi23/Thunder](https://github.com/harshjoshi23/Thunder). Set `OPENAI_API_KEY` (and optional `FAL_KEY`, etc.) in the Render dashboard — never commit secrets.
 
-Step-by-step: [docs/PRESENTATION_GUIDE.md](docs/PRESENTATION_GUIDE.md) · [docs/developer-setup.md](docs/developer-setup.md)
+Step-by-step: [docs/developer-setup.md](docs/developer-setup.md)
 
 ## Submission materials
 
 | Asset | Path |
 |-------|------|
+| **Portal paste fields** | [docs/submission/PORTAL_FILL.md](docs/submission/PORTAL_FILL.md) |
 | Pitch deck (PDF) | [docs/submission/Thunder_Pitch_Deck.pdf](docs/submission/Thunder_Pitch_Deck.pdf) |
 | Pitch deck (PPTX) | [docs/submission/Thunder_Pitch_Deck.pptx](docs/submission/Thunder_Pitch_Deck.pptx) |
 | Submission kit | [docs/submission/Thunder_Submission_Kit.pdf](docs/submission/Thunder_Submission_Kit.pdf) |
-| Logo | [docs/submission/Thunder_Logo.svg](docs/submission/Thunder_Logo.svg) |
-| Video script + ElevenLabs TTS | [docs/VIDEO_SCRIPT.md](docs/VIDEO_SCRIPT.md) |
-| How to present / portal checklist | [docs/PRESENTATION_GUIDE.md](docs/PRESENTATION_GUIDE.md) |
+| Logo (square PNG) | [docs/submission/Thunder_Logo.png](docs/submission/Thunder_Logo.png) |
 | Sample carousel copy | [docs/samples/carousel-sample.md](docs/samples/carousel-sample.md) |
 
 ## Docs

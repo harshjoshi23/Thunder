@@ -1,6 +1,8 @@
 # Thunder — portal fill (creators-ecosystem.de)
 
-Paste-ready. Replace only `TODO_*` after you upload/deploy.
+**Final paste-ready values** for the submission form. Replace only `TODO_VIDEO_URL` after you upload the video.
+
+**Demo status (checked ASAP):** No `*.onrender.com` URL in docs, env hosts (`NEXT_PUBLIC_APP_URL` is local/private only), or remotes. Official Render CLI not installed / not authenticated (`RENDER_API_KEY` unset). **No public demo URL — leave Live demo blank.**
 
 ---
 
@@ -36,13 +38,7 @@ Upload this file (512×512 PNG, square):
 TODO_VIDEO_URL
 ```
 
-**How to make it (5 steps)**
-
-1. Paste the full script from [`ELEVENLABS_PASTE.txt`](./ELEVENLABS_PASTE.txt) into ElevenLabs Speech → download audio (**~1:50**, ~240–280 words). Do **not** use the old short ~40–50s block — it is too short for a 1:50 video. Cues/timing: [`ELEVENLABS_VIDEO.md`](./ELEVENLABS_VIDEO.md).
-2. Sync VO under your finished ~1:50 screen recording (Home → inputs → Run → Twin → Jury → Diagnostics → Carousel → Before/After → close), or re-record with `npm run dev` + seeded demo while the audio plays.
-3. Optional: Image & Video / SFX prompts are in `ELEVENLABS_VIDEO.md` if you unlock those modes.
-4. Upload to Loom or YouTube (unlisted/public).
-5. Paste the public link into the portal (replace `TODO_VIDEO_URL`).
+You must upload Loom/YouTube and paste the public link. Script/cues: [`ELEVENLABS_PASTE.txt`](./ELEVENLABS_PASTE.txt), [`ELEVENLABS_VIDEO.md`](./ELEVENLABS_VIDEO.md).
 
 ---
 
@@ -56,78 +52,58 @@ https://github.com/harshjoshi23/Thunder
 
 ## Live demo URL (optional)
 
-**Honest status:** Live demo is **NOT submitted** until a public `https://….onrender.com` URL exists. `172.x` / `localhost:3000` are local-only — do **not** paste them in the portal.
+**Leave blank.** No public demo URL found. Do not paste `localhost`, LAN/`172.x`, or invented `onrender.com` hosts.
 
-**ASAP Render deploy (~10 min) — 5 steps**
-
-1. Open [dashboard.render.com](https://dashboard.render.com) → **New** → **Blueprint** → connect GitHub repo `harshjoshi23/Thunder` (uses root `render.yaml`).
-2. Confirm service **thunder** (Node web, `npm install && npm run build`, start `npm run start`, health `/api/health`).
-3. In **Environment**, set secrets (sync:false in blueprint): **required** `OPENAI_API_KEY`; optional `FAL_KEY`, `ELEVENLABS_API_KEY`, `FIRECRAWL_API_KEY`, n8n keys. Leave model defaults as in `render.yaml`.
-4. Deploy → wait for green. Open the service URL → confirm `/` loads and `/api/health` returns JSON. Then set `NEXT_PUBLIC_APP_URL` to that exact `https://….onrender.com` URL and **Manual Deploy** once more.
-5. Paste that public URL into the portal (replace below). Until then leave blank or keep the placeholder.
+(After you deploy via `render.yaml` on Render, paste the real `https://….onrender.com` URL here and in the portal.)
 
 ```
-TODO_DEMO_URL
+(leave blank)
 ```
-
-**Portal field:** Live demo URL → paste only the Render HTTPS URL (e.g. `https://thunder-xxxx.onrender.com`), never LAN IPs.
 
 ---
 
 ## Pitch deck URL
 
-**Prefer (Drive, anyone with link):** upload `docs/submission/Thunder_Pitch_Deck.pdf` → share → paste link.
-
-**Or GitHub:**
+**Blob (preferred for portal “page” link):**
 
 ```
 https://github.com/harshjoshi23/Thunder/blob/main/docs/submission/Thunder_Pitch_Deck.pdf
 ```
 
-Raw (if portal wants a direct file):
+**Raw (direct file download):**
 
 ```
 https://github.com/harshjoshi23/Thunder/raw/main/docs/submission/Thunder_Pitch_Deck.pdf
 ```
 
-Placeholder if Drive not ready yet:
-
-```
-TODO_PITCH_PUBLIC_URL
-```
+Local file if uploading to Drive instead: `docs/submission/Thunder_Pitch_Deck.pdf`
 
 ---
 
-## Google Drive samples (or GitHub fallback)
+## Samples / supporting materials
 
-Suggested Drive folder contents: screenshots from `docs/images/`, carousel sample, `Thunder_Submission_Kit.pdf`.
-
-**GitHub fallbacks (no Drive yet):**
+**GitHub tree (images + assets):**
 
 ```
 https://github.com/harshjoshi23/Thunder/tree/main/docs/images
 ```
 
+**Submission kit PDF:**
+
 ```
 https://github.com/harshjoshi23/Thunder/blob/main/docs/submission/Thunder_Submission_Kit.pdf
 ```
 
-Placeholder:
-
-```
-TODO_SAMPLES_URL
-```
-
 ---
 
-## Sponsors — tick these
+## Sponsors — tick YES for all
 
 | Sponsor | Tick? | Why (one line) |
 |---------|-------|----------------|
 | **Cursor** | YES | Built entirely in Cursor |
 | **fal.ai** | YES | fal client in repo: LM fallback (`src/lib/fal/lm.ts`) + Flux covers (`src/lib/fal/image.ts`); `FAL_KEY` in `render.yaml` |
 | **ElevenLabs** | YES | `/api/voiceover` calls ElevenLabs TTS; also used for video VO |
-| **Render** | YES | `render.yaml` blueprint in repo (deploy path for demo) |
+| **Render** | YES | `render.yaml` Blueprint in repo for the Next.js web service deploy path |
 | **n8n** | YES | Workflow JSON + `POST /api/export/n8n` approve-and-send |
 | **Firecrawl** | YES | `/api/source` Firecrawl scrape when `FIRECRAWL_API_KEY` set |
 

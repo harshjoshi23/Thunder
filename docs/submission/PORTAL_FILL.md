@@ -38,9 +38,9 @@ TODO_VIDEO_URL
 
 **How to make it (5 steps)**
 
-1. Open [`ELEVENLABS_VIDEO.md`](./ELEVENLABS_VIDEO.md) — paste **Block 1** into ElevenLabs Speech → download audio (~40–50s).
-2. Run `npm run dev` → Load seeded demo → record screen following the timing table in that file (play VO underneath or speak live).
-3. Optional: Image & Video / SFX prompts are in the same file if you unlock those modes.
+1. Paste the full script from [`ELEVENLABS_PASTE.txt`](./ELEVENLABS_PASTE.txt) into ElevenLabs Speech → download audio (**~1:50**, ~240–280 words). Do **not** use the old short ~40–50s block — it is too short for a 1:50 video. Cues/timing: [`ELEVENLABS_VIDEO.md`](./ELEVENLABS_VIDEO.md).
+2. Sync VO under your finished ~1:50 screen recording (Home → inputs → Run → Twin → Jury → Diagnostics → Carousel → Before/After → close), or re-record with `npm run dev` + seeded demo while the audio plays.
+3. Optional: Image & Video / SFX prompts are in `ELEVENLABS_VIDEO.md` if you unlock those modes.
 4. Upload to Loom or YouTube (unlisted/public).
 5. Paste the public link into the portal (replace `TODO_VIDEO_URL`).
 
@@ -56,17 +56,21 @@ https://github.com/harshjoshi23/Thunder
 
 ## Live demo URL (optional)
 
-**Honest status:** No public `.onrender.com` URL in the repo/env yet. Leave blank if short on time — GitHub + video are enough.
+**Honest status:** Live demo is **NOT submitted** until a public `https://….onrender.com` URL exists. `172.x` / `localhost:3000` are local-only — do **not** paste them in the portal.
 
-If you deploy ASAP:
+**ASAP Render deploy (~10 min) — 5 steps**
 
-1. Render → New → Blueprint → connect `harshjoshi23/Thunder` (`render.yaml` present)
-2. Set at least `OPENAI_API_KEY`; set `NEXT_PUBLIC_APP_URL` to the Render URL
-3. Paste:
+1. Open [dashboard.render.com](https://dashboard.render.com) → **New** → **Blueprint** → connect GitHub repo `harshjoshi23/Thunder` (uses root `render.yaml`).
+2. Confirm service **thunder** (Node web, `npm install && npm run build`, start `npm run start`, health `/api/health`).
+3. In **Environment**, set secrets (sync:false in blueprint): **required** `OPENAI_API_KEY`; optional `FAL_KEY`, `ELEVENLABS_API_KEY`, `FIRECRAWL_API_KEY`, n8n keys. Leave model defaults as in `render.yaml`.
+4. Deploy → wait for green. Open the service URL → confirm `/` loads and `/api/health` returns JSON. Then set `NEXT_PUBLIC_APP_URL` to that exact `https://….onrender.com` URL and **Manual Deploy** once more.
+5. Paste that public URL into the portal (replace below). Until then leave blank or keep the placeholder.
 
 ```
 TODO_DEMO_URL
 ```
+
+**Portal field:** Live demo URL → paste only the Render HTTPS URL (e.g. `https://thunder-xxxx.onrender.com`), never LAN IPs.
 
 ---
 

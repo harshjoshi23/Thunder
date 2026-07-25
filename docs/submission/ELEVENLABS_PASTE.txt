@@ -1,0 +1,21 @@
+This is Thunder. Test your post before your audience does.
+
+Creators usually learn what landed only after they publish. Thunder rehearses first — grounded in your real audience comments, not invented personas.
+
+On Home, the product is clear: paste historical comments, a short creator context, and your draft. Load the seeded demo anytime you want a fast, labeled walkthrough.
+
+These inputs are evidence. Every later claim ties back to comment IDs you can check — nothing floats free of what your audience already said.
+
+Click Run Audience Test. One click starts a multi-agent scenario graph: an audience twin, three parallel jurors, an adversarial critic, then deterministic TypeScript scoring. Watch the agents work in parallel instead of a single opaque score.
+
+Here is the Audience Twin — three differentiated segments, each tied to validated comment evidence so you can see who is speaking and why they care.
+
+Reaction Lab is the Jury. Segments disagree on purpose. Conflict is the signal: you see trade-offs before you post, not after the comments roll in.
+
+Diagnostics stay transparent. Scores come from formulas in TypeScript — the model does not invent them. Guardrails flag exaggeration and missing context so the rehearsal stays honest and reviewable.
+
+Strategy turns those trade-offs into a five-slide carousel, caption, call to action, and optional voiceover script — ready to ship or revise with intent.
+
+Before and after uses the same formulas on original versus optimized. Audience fit goes up; misinterpretation risk goes down. Modes are labeled honestly — Live, Seeded demo, or Recovery fallback.
+
+That’s Thunder. Test your post before your audience does.

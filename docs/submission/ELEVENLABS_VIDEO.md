@@ -2,8 +2,11 @@
 
 Use this with [elevenlabs.io](https://elevenlabs.io) **Speech** (and optional Image & Video / Sound Effects).
 
-**Recommended for submission:** a **40–50 second** product clip + this VO.  
-Optional: longer ~2 min version at the bottom.
+**Recommended for submission:** your finished **~1 min 50 sec** screen recording + the VO in `ELEVENLABS_PASTE.txt` (~240–280 words at ~150 wpm).
+
+**Do not use the old short ~40–50s block** — it is too short for a 1:50 video.
+
+Primary paste file: [`ELEVENLABS_PASTE.txt`](./ELEVENLABS_PASTE.txt)
 
 ---
 
@@ -17,39 +20,55 @@ Optional: longer ~2 min version at the bottom.
 | Stability | Medium–High (less wild emotion) |
 
 1. Open **Speech**
-2. Paste **Block 1** below
+2. Paste the **entire** contents of `ELEVENLABS_PASTE.txt` (also copied in **Block 1** below)
 3. **Generate** → Download MP3/WAV
-4. In Loom/QuickTime: record Thunder screen (`npm run dev` → Load seeded demo → Run → Twin → Jury → Before/After) while playing this audio, **or** speak live using the same words
+4. In Loom/QuickTime: sync the VO under your **1:50** Thunder screen recording (or re-record while playing this audio)
 
 ---
 
-## B) Block 1 — paste into Speech (~40–50 seconds)
+## B) Block 1 — paste into Speech (~1:50 / ~265 words)
 
-Copy **everything inside the fence** into ElevenLabs:
+Copy **everything inside the fence** into ElevenLabs (same text as `ELEVENLABS_PASTE.txt`):
 
 ```
 This is Thunder. Test your post before your audience does.
 
-Creators usually find out what landed only after they publish. Thunder rehearses first.
+Creators usually learn what landed only after they publish. Thunder rehearses first — grounded in your real audience comments, not invented personas.
 
-Paste your real audience comments and a draft. One click runs a multi-agent jury: an audience twin, three conflicting reactions, guardrails, and transparent scores.
+On Home, the product is clear: paste historical comments, a short creator context, and your draft. Load the seeded demo anytime you want a fast, labeled walkthrough.
 
-Then you get a stronger five-slide carousel — and a clear before-versus-after.
+These inputs are evidence. Every later claim ties back to comment IDs you can check — nothing floats free of what your audience already said.
 
-Not a view predictor. A grounded rehearsal from your comments.
+Click Run Audience Test. One click starts a multi-agent scenario graph: an audience twin, three parallel jurors, an adversarial critic, then deterministic TypeScript scoring. Watch the agents work in parallel instead of a single opaque score.
 
-That’s Thunder.
+Here is the Audience Twin — three differentiated segments, each tied to validated comment evidence so you can see who is speaking and why they care.
+
+Reaction Lab is the Jury. Segments disagree on purpose. Conflict is the signal: you see trade-offs before you post, not after the comments roll in.
+
+Diagnostics stay transparent. Scores come from formulas in TypeScript — the model does not invent them. Guardrails flag exaggeration and missing context so the rehearsal stays honest and reviewable.
+
+Strategy turns those trade-offs into a five-slide carousel, caption, call to action, and optional voiceover script — ready to ship or revise with intent.
+
+Before and after uses the same formulas on original versus optimized. Audience fit goes up; misinterpretation risk goes down. Modes are labeled honestly — Live, Seeded demo, or Recovery fallback.
+
+That’s Thunder. Test your post before your audience does.
 ```
 
-**On-screen while this plays (~45s):**
+**On-screen while this plays (~1:50):**
 
-| Approx | Show |
-|--------|------|
-| 0–8s | Home / logo / tagline |
-| 8–18s | Seeded comments + draft inputs |
-| 18–28s | Click **Run Audience Test** → running agents |
-| 28–38s | Audience Twin or Reaction Lab (disagreement) |
-| 38–50s | Before / After table → end on logo |
+| Approx | Section | Show |
+|--------|---------|------|
+| 0–12s | Home | Logo / tagline / landing |
+| 12–28s | Inputs | Seeded comments + draft + context |
+| 28–42s | Run | Click **Run Audience Test** → agents running |
+| 42–58s | Twin | Audience Twin / segments + evidence IDs |
+| 58–78s | Jury | Reaction Lab — conflicting segment takes |
+| 78–92s | Diagnostics | Scores, formulas, guardrails |
+| 92–105s | Carousel | Five-slide strategy output |
+| 105–118s | Before/After | Comparison table |
+| 118s–1:50 | Close | Logo + tagline |
+
+*(Adjust cuts slightly so VO lands with each page; total target ~1:50.)*
 
 ---
 
@@ -75,35 +94,10 @@ Generate separately, mix quietly under VO (don’t overpower):
 
 ---
 
-## E) Block 2 — longer VO (~2 min) if you need it
-
-```
-This is Thunder — test your post before your audience does.
-Creators usually learn what landed only after they publish. Thunder rehearses the post first.
-
-You paste historical comments, a short creator context, and a draft. Evidence comes from your comments — not invented personas.
-
-One click runs a multi-agent scenario graph: an audience twin, three parallel jurors, an adversarial critic, then deterministic TypeScript scoring.
-
-Here is the audience twin — three differentiated segments, each tied to validated comment evidence IDs.
-
-Reaction Lab surfaces disagreement on purpose. Segments conflict — that’s the point. You see trade-offs before you post.
-
-Diagnostics are transparent formulas in TypeScript — the model does not invent the scores. Guardrails flag exaggeration and missing context.
-
-Strategy resolves the trade-offs into a five-slide carousel, caption, call to action, and optional voiceover script.
-
-Before and after: same formulas on original versus optimized. Audience fit up, misinterpretation risk down.
-Live, Seeded demo, or Recovery fallback — always labeled honestly.
-That’s Thunder.
-```
-
----
-
-## F) After you have the file
+## E) After you have the file
 
 1. Upload video to **Loom** or **YouTube** (public or unlisted)
 2. Paste the link into the hackathon portal → **2-minute video pitch**
 3. Update `TODO_VIDEO_URL` in `docs/submission/PORTAL_FILL.md` if you want a local reminder
 
-**Tip:** Portal says “2-minute”; a tight **45–90s** product demo is fine if the platform allows — check the form. If it requires ~2 min, use **Block 2** or slow the screen tour and keep Block 1 as the VO spine with a few extra seconds of Before/After.
+**Tip:** Portal says “2-minute”; your **~1:50** product demo + this VO is the intended length.

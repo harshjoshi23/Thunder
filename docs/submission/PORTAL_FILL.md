@@ -38,11 +38,11 @@ TODO_VIDEO_URL
 
 **How to make it (5 steps)**
 
-1. Open gitignored `docs/video-recording-private.md` (full script + ElevenLabs TTS).
-2. Run `npm run dev` → Load seeded demo (or Live if keys set) → record screen + voice (~2 min).
-3. Optional: paste the ElevenLabs block from that private file for VO.
+1. Open [`ELEVENLABS_VIDEO.md`](./ELEVENLABS_VIDEO.md) — paste **Block 1** into ElevenLabs Speech → download audio (~40–50s).
+2. Run `npm run dev` → Load seeded demo → record screen following the timing table in that file (play VO underneath or speak live).
+3. Optional: Image & Video / SFX prompts are in the same file if you unlock those modes.
 4. Upload to Loom or YouTube (unlisted/public).
-5. Paste the public link here and into the portal (replace `TODO_VIDEO_URL`).
+5. Paste the public link into the portal (replace `TODO_VIDEO_URL`).
 
 ---
 

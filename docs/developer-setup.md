@@ -20,6 +20,13 @@ Copy `.env.example` → `.env.local` and fill what you need:
 | `THUNDER_ENABLE_FALLBACK` | Allow labeled recovery when live fails (default true) |
 | `ANALYZE_TIMEOUT_MS` | Pipeline timeout |
 | `FORCE_SEEDED_DEMO` | Force seeded path even with live keys |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Shared rate limits (else in-memory + warning) |
+| `THUNDER_RATE_LIMIT` / `THUNDER_RATE_WINDOW_MS` | Rate limit defaults |
+| `CLERK_SECRET_KEY` / `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Optional auth on costly routes |
+| `THUNDER_API_TOKEN` | Optional Bearer token for scripts/CI |
+| `SENTRY_DSN` | Optional error monitoring stub |
+
+**Auth behavior:** if Clerk secret or `THUNDER_API_TOKEN` is set, `/api/cover`, `/api/voiceover`, `/api/source`, `/api/export/n8n`, and live `/api/analyze` require auth. Seeded / no-language-key analyze stays open (no paid LM burn). If auth env is unset, the public demo path stays open with rate limits only.
 
 **Routing:** if `OPENAI_API_KEY` → OpenAI for language agents; else if `FAL_KEY` → fal `any-llm`; else Seeded demo / Recovery fallback. Cover images always need `FAL_KEY` for live Flux.
 

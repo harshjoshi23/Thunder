@@ -5,6 +5,11 @@ import {
   checkRateLimit,
   rateLimitResponse,
 } from "@/lib/security/rate-limit";
+import {
+  requireApiAuth,
+  unauthorizedResponse,
+} from "@/lib/security/auth";
+import { captureException } from "@/lib/monitoring/sentry";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -15,7 +20,12 @@ const VoiceoverRequestSchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const limited = checkRateLimit(request, "voiceover", { limit: 8 });
+    const auth = await requireApiAuth(request);
+    if (!auth.ok) {
+      return unauthorizedResponse(auth.error);
+    }
+
+    const limited = await checkRateLimit(request, "voiceover", { limit: 8 });
     if (!limited.ok) {
       return rateLimitResponse(limited.retryAfterSec);
     }
@@ -89,6 +99,7 @@ export async function POST(request: Request) {
       message: "Voiceover generated with ElevenLabs.",
     });
   } catch (err) {
+    captureException(err, { route: "voiceover" });
     const message = err instanceof Error ? err.message : "Voiceover failed";
     return NextResponse.json({
       ok: false,

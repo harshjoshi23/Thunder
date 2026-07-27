@@ -64,3 +64,16 @@ services:
         value: "3600000"
       - key: FORCE_SEEDED_DEMO
         value: "false"
+      # Phase 0 harden — set in dashboard (do not commit secrets)
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: THUNDER_API_TOKEN
+        sync: false
+      - key: SENTRY_DSN
+        sync: false

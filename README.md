@@ -2,14 +2,31 @@
 
 **Test your post before your audience does.**
 
-Thunder is a pre-publication **scenario lab** for creators: turn historical comments into an evidence-backed audience twin, run a multi-agent jury rehearsal, score the draft with transparent TypeScript formulas, and ship an improved five-slide carousel — with modes labeled honestly as **Live**, **Seeded demo**, or **Recovery fallback**.
+Thunder is a personal **audience operating system** in progress: rehearse how segments grounded in *your* imported comments might react, score drafts with transparent TypeScript formulas, and (over time) produce → approve → publish. Modes stay labeled honestly as **Live**, **Seeded demo**, or **Recovery fallback**.
 
-> Grounded simulation from *your* imported comments. Not a view predictor. Not a virality guarantee. No login.
+This repo ships the working preflight lab today. **Studio / Media / Publish** layers are on the roadmap — not vapor claims.
+
+> Grounded simulation from your comments. Not a view predictor. Not a virality guarantee.
 
 **Live demo:** [https://thunder-psio.onrender.com](https://thunder-psio.onrender.com)  
 (Cold start on Render free tier can take ~30–60s. Use **Load seeded demo** → **Run Audience Test**.)
 
+**Status:** [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md) · Roadmap: [GitHub issue #1](https://github.com/harshjoshi23/Thunder/issues/1)
+
 ![Thunder Audience Data](docs/images/01-audience-data.png)
+
+## Shipped vs building
+
+| Layer | Status |
+|-------|--------|
+| Preflight lab (6 stages, LangGraph jury, TS scores) | **Shipped** — public demo |
+| Harden (Redis limits, auth foundation, CI, Terms/Privacy) | **Phase 0** — this release |
+| Studio (accounts, Postgres, twins, billing) | Building — Phase 1 |
+| Media (carousel assets, VO, Remotion/FFmpeg, S3) | Later — Phase 2 |
+| Publish (ZIP → OAuth platforms) | Later — Phase 3 |
+| Teams / Circles / Network | Later — Phases 4–6 |
+
+Hackathon submission materials remain under [`docs/submission/`](docs/submission/) for history; the product line continues here.
 
 ## Problem
 
@@ -17,10 +34,10 @@ Creators publish into silence or backlash because they only learn audience react
 
 ## Solution
 
-1. Import historical comments + draft
-2. Build a three-segment audience twin grounded in comment evidence IDs
-3. Run three parallel juror personas + an adversarial critic
-4. Score original vs optimized drafts with deterministic formulas
+1. Import historical comments + draft  
+2. Build a three-segment audience twin grounded in comment evidence IDs  
+3. Run three parallel juror personas + an adversarial critic  
+4. Score original vs optimized drafts with deterministic formulas  
 5. Export carousel (optional cover / voiceover / n8n handoff)
 
 ## Product surface (6 stages)
@@ -61,18 +78,20 @@ normalize → audience → evidence → juror×3 (parallel) → critic
   → TS scoring → strategy (+ voiceoverScript) → optimized eval → verify
 ```
 
-## Sponsors / integrations actually used
+## Integrations
 
 | Integration | Role | Status |
 |-------------|------|--------|
 | OpenAI | Live audience / jurors / critic / strategy | Live when key present |
 | fal.ai | Optional LM fallback + cover image | Cover needs `FAL_KEY` |
+| Upstash Redis | Shared rate limits | Optional; in-memory fallback |
+| Clerk / API token | Auth on costly routes | Optional foundation |
 | Firecrawl | Optional source URL scrape | Optional |
 | ElevenLabs | Optional voiceover audio | Optional |
 | n8n | Approve & send webhook | Optional |
-| Cursor | Build environment | Used |
+| Sentry | Error monitoring | Env stub (`SENTRY_DSN`) |
 
-## Architecture
+## Architecture (today → target)
 
 ```mermaid
 flowchart TB
@@ -82,13 +101,14 @@ flowchart TB
   LG --> OpenAI[OpenAI_preferred]
   LG --> FalLM[fal_any-llm_fallback]
   LG --> Score[Deterministic_TS_scoring]
+  Next --> Redis[Redis_or_memory_limits]
+  Next --> Auth[Clerk_or_token_optional]
   Next --> FalImg[fal_flux_cover]
   Next --> Eleven[ElevenLabs_optional]
   Next --> N8N[n8n_webhook_optional]
-  Next -.-> Firecrawl[Firecrawl_optional]
 ```
 
-Details: [docs/architecture.md](docs/architecture.md) · setup: [docs/developer-setup.md](docs/developer-setup.md)
+Target over phases: **Postgres + Redis + S3 + Clerk**, workers for media/publish. Details: [docs/architecture.md](docs/architecture.md) · setup: [docs/developer-setup.md](docs/developer-setup.md)
 
 ## Quick start (seeded demo)
 
@@ -110,51 +130,52 @@ npm run build
 npm run test:e2e   # Playwright — forced seeded/fallback, no credit burn
 ```
 
+CI runs lint, typecheck, vitest, and production build on `main` / PRs.
+
 ## Honest limitations
 
 - Jury agents simulate segments from **imported comments**, not live humans
 - Scores are transparent formulas over factor ratings — not platform analytics
 - Cover / voice / n8n stay recovery until their keys/webhooks exist
-- No Instagram / TikTok / Reddit / Twitter native OAuth posting
+- No Instagram / TikTok / Reddit / Twitter native OAuth posting yet (Phase 3)
 - Without OpenAI or fal language keys, runs are Seeded demo / Recovery fallback — never fake Live
-- Public demo has **no login**; costly routes are **rate-limited per IP**. Set an OpenAI usage budget. Rotate keys if they were ever pasted in chat.
+- Costly routes are **rate-limited** (Redis when configured). Optional Clerk / `THUNDER_API_TOKEN` gates live spend; seeded/no-LM analyze stays usable. Rotate keys if they were ever pasted in chat.
 
-## Sharing (LinkedIn / friends)
+## Legal
+
+- [Terms of Use](https://thunder-psio.onrender.com/terms) · [Privacy](https://thunder-psio.onrender.com/privacy)
+
+## Sharing
 
 Safe to share:
 - Live demo: [https://thunder-psio.onrender.com](https://thunder-psio.onrender.com)
 - GitHub: [https://github.com/harshjoshi23/Thunder](https://github.com/harshjoshi23/Thunder)
 
-Do **not** share: API keys, `.env.local`, Render dashboard secrets, or private Discord coupons.
+Do **not** share: API keys, `.env.local`, Render dashboard secrets.
 
 ## Deploy
 
 **Production:** [https://thunder-psio.onrender.com](https://thunder-psio.onrender.com)
 
-Render blueprint: [`render.yaml`](render.yaml) (health check `/api/health`). Repo: [github.com/harshjoshi23/Thunder](https://github.com/harshjoshi23/Thunder). Set `OPENAI_API_KEY` and `NEXT_PUBLIC_APP_URL=https://thunder-psio.onrender.com` (plus optional `FAL_KEY`, etc.) in the Render dashboard — never commit secrets.
+Render blueprint: [`render.yaml`](render.yaml) (health check `/api/health`). Set `OPENAI_API_KEY` and `NEXT_PUBLIC_APP_URL=https://thunder-psio.onrender.com`, plus optional Upstash Redis, Clerk, and `SENTRY_DSN` in the dashboard — never commit secrets.
 
 Step-by-step: [docs/developer-setup.md](docs/developer-setup.md)
 
-## Submission materials
+## Submission archive (hackathon)
 
 | Asset | Path |
 |-------|------|
-| **Portal paste fields** | [docs/submission/PORTAL_FILL.md](docs/submission/PORTAL_FILL.md) |
+| Portal paste fields | [docs/submission/PORTAL_FILL.md](docs/submission/PORTAL_FILL.md) |
 | Pitch deck (PDF) | [docs/submission/Thunder_Pitch_Deck.pdf](docs/submission/Thunder_Pitch_Deck.pdf) |
-| Pitch deck (PPTX) | [docs/submission/Thunder_Pitch_Deck.pptx](docs/submission/Thunder_Pitch_Deck.pptx) |
-| Submission kit | [docs/submission/Thunder_Submission_Kit.pdf](docs/submission/Thunder_Submission_Kit.pdf) |
-| Logo (square PNG) | [docs/submission/Thunder_Logo.png](docs/submission/Thunder_Logo.png) |
 | Sample carousel copy | [docs/samples/carousel-sample.md](docs/samples/carousel-sample.md) |
 
 ## Docs
 
-- [docs/EXPLAINER.md](docs/EXPLAINER.md) — simple English
-- [docs/judge-questions.md](docs/judge-questions.md) — honest Q&A
-- [docs/architecture.md](docs/architecture.md)
-- [docs/developer-setup.md](docs/developer-setup.md)
+- [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md) — phase tracker  
+- [docs/EXPLAINER.md](docs/EXPLAINER.md)  
+- [docs/architecture.md](docs/architecture.md)  
+- [docs/developer-setup.md](docs/developer-setup.md)  
 
 ## License
 
 **GPL-3.0** — see [`LICENSE`](LICENSE).
-
-Built for Cursor Hackathon Stuttgart.

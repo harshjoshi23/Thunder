@@ -243,11 +243,29 @@ export default function HomePage() {
         ) : null}
 
         <footer className="border-t border-border pt-6 text-xs text-muted">
-          Thunder runs a grounded scenario simulation based on patterns in the
-          creator’s supplied audience data. It does not predict real humans
-          perfectly, guarantee virality, or produce scientific view forecasts.
-          Modes are labeled Live / Seeded demo / Recovery fallback — never
-          silently faked as live.
+          <p>
+            Thunder runs a grounded scenario simulation based on patterns in the
+            creator’s supplied audience data. It does not predict real humans
+            perfectly, guarantee virality, or produce scientific view forecasts.
+            Modes are labeled Live / Seeded demo / Recovery fallback — never
+            silently faked as live.
+          </p>
+          <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+            <a href="/terms" className="underline underline-offset-2 hover:text-fg">
+              Terms
+            </a>
+            <a href="/privacy" className="underline underline-offset-2 hover:text-fg">
+              Privacy
+            </a>
+            <a
+              href="https://github.com/harshjoshi23/Thunder"
+              className="underline underline-offset-2 hover:text-fg"
+              target="_blank"
+              rel="noreferrer"
+            >
+              GitHub
+            </a>
+          </p>
         </footer>
       </main>
     </div>

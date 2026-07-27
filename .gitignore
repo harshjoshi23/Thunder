@@ -60,3 +60,8 @@ next-env.d.ts
 docs/video-recording-private.md
 docs/submission/PORTAL_FILL.md
 docs/submission/ELEVENLABS_VIDEO.md
+
+# private product strategy (Vision / Launch Roadmap / Blueprint Word docs)
+docs/newThunder/
+docs/newThunder/**
+*.docx

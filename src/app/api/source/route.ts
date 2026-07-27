@@ -5,6 +5,11 @@ import {
   checkRateLimit,
   rateLimitResponse,
 } from "@/lib/security/rate-limit";
+import {
+  requireApiAuth,
+  unauthorizedResponse,
+} from "@/lib/security/auth";
+import { captureException } from "@/lib/monitoring/sentry";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -15,7 +20,12 @@ const SourceRequestSchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const limited = checkRateLimit(request, "source", { limit: 12 });
+    const auth = await requireApiAuth(request);
+    if (!auth.ok) {
+      return unauthorizedResponse(auth.error);
+    }
+
+    const limited = await checkRateLimit(request, "source", { limit: 12 });
     if (!limited.ok) {
       return rateLimitResponse(limited.retryAfterSec);
     }
@@ -81,6 +91,7 @@ export async function POST(request: Request) {
       message: "Source scraped with Firecrawl.",
     });
   } catch (err) {
+    captureException(err, { route: "source" });
     const message = err instanceof Error ? err.message : "Source fetch failed";
     return NextResponse.json({
       ok: false,

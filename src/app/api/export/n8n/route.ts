@@ -7,12 +7,22 @@ import {
   checkRateLimit,
   rateLimitResponse,
 } from "@/lib/security/rate-limit";
+import {
+  requireApiAuth,
+  unauthorizedResponse,
+} from "@/lib/security/auth";
+import { captureException } from "@/lib/monitoring/sentry";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
-    const limited = checkRateLimit(request, "n8n-export", { limit: 20 });
+    const auth = await requireApiAuth(request);
+    if (!auth.ok) {
+      return unauthorizedResponse(auth.error);
+    }
+
+    const limited = await checkRateLimit(request, "n8n-export", { limit: 20 });
     if (!limited.ok) {
       return rateLimitResponse(limited.retryAfterSec);
     }
@@ -68,6 +78,7 @@ export async function POST(request: Request) {
       clearTimeout(timer);
     }
   } catch (err) {
+    captureException(err, { route: "n8n-export" });
     const message = err instanceof Error ? err.message : "Export failed";
     return NextResponse.json({
       ok: false,

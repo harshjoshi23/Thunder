@@ -3,6 +3,7 @@ import { hasFalKey } from "@/lib/fal/config";
 import { hasOpenAiKey } from "@/lib/llm/config";
 import { isAuthConfigured } from "@/lib/security/auth";
 import { isSentryConfigured } from "@/lib/monitoring/sentry";
+import { isDatabaseConfigured } from "@/lib/db/prisma";
 
 export const runtime = "nodejs";
 
@@ -28,6 +29,8 @@ export async function GET() {
     n8nConfigured: Boolean(process.env.N8N_WEBHOOK_URL?.trim()),
     authConfigured: isAuthConfigured(),
     redisConfigured,
+    databaseConfigured: isDatabaseConfigured(),
+    stripeConfigured: Boolean(process.env.STRIPE_SECRET_KEY?.trim()),
     sentryConfigured: isSentryConfigured(),
     fallbackEnabled:
       process.env.THUNDER_ENABLE_FALLBACK !== "false" &&

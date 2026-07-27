@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import type { AnalyzeResult } from "@/lib/schemas";
 import { AnalyzeResultSchema } from "@/lib/schemas";
 import { SEED_INPUT } from "@/lib/mock/seed-input";
@@ -165,9 +166,16 @@ export default function HomePage() {
               <ThemeToggle />
               <ModeBadge mode={result?.mode} confidence={result?.confidence} />
             </div>
-            <Button type="button" variant="ghost" size="sm" onClick={resetDemo}>
-              Reset demo
-            </Button>
+            <div className="flex items-center gap-2">
+              <Link href="/studio">
+                <Button type="button" variant="secondary" size="sm">
+                  Studio
+                </Button>
+              </Link>
+              <Button type="button" variant="ghost" size="sm" onClick={resetDemo}>
+                Reset demo
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -251,6 +259,9 @@ export default function HomePage() {
             silently faked as live.
           </p>
           <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+            <Link href="/studio" className="underline underline-offset-2 hover:text-fg">
+              Studio
+            </Link>
             <a href="/terms" className="underline underline-offset-2 hover:text-fg">
               Terms
             </a>

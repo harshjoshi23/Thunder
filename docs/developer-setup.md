@@ -25,10 +25,23 @@ Copy `.env.example` → `.env.local` and fill what you need:
 | `CLERK_SECRET_KEY` / `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Optional auth on costly routes |
 | `THUNDER_API_TOKEN` | Optional Bearer token for scripts/CI |
 | `SENTRY_DSN` | Optional error monitoring stub |
+| `DATABASE_URL` | Postgres for Thunder Studio (Neon or `docker compose`). Without it, Studio APIs return **503**; `/` demo still works |
+| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` / `STRIPE_PRICE_CREATOR_PRO` | Optional billing; local demo does not need them |
+| `STRIPE_WEBHOOK_ALLOW_UNSIGNED` | Local stub only (`true`) — never on Render |
 
-**Auth behavior:** if Clerk secret or `THUNDER_API_TOKEN` is set, `/api/cover`, `/api/voiceover`, `/api/source`, `/api/export/n8n`, and live `/api/analyze` require auth. Seeded / no-language-key analyze stays open (no paid LM burn). If auth env is unset, the public demo path stays open with rate limits only.
+**Auth behavior:** if Clerk secret or `THUNDER_API_TOKEN` is set, `/api/cover`, `/api/voiceover`, `/api/source`, `/api/export/n8n`, and live `/api/analyze` require auth. Seeded / no-language-key analyze stays open (no paid LM burn). If auth env is unset, the public demo path stays open with rate limits only. Studio uses the same auth foundation, or a local `dev-local` workspace stub when auth is unset.
 
 **Routing:** if `OPENAI_API_KEY` → OpenAI for language agents; else if `FAL_KEY` → fal `any-llm`; else Seeded demo / Recovery fallback. Cover images always need `FAL_KEY` for live Flux.
+
+## Thunder Studio (Postgres)
+
+1. **Neon:** create a project → copy connection string → `DATABASE_URL=…` in `.env.local` / Render  
+2. **Or Docker:** `docker compose up -d` then  
+   `DATABASE_URL=postgresql://thunder:thunder@127.0.0.1:5432/thunder`  
+3. Migrate: `npx prisma migrate deploy` (or `npm run db:migrate`)  
+4. Open `/studio` — create a project, **Run seeded & save** (no OpenAI spend), edit brand kits, import CSV  
+
+Studio routes: `/api/studio/projects`, `/runs`, `/twins`, `/brand-kits`, `/import/csv`, `/entitlement`. Billing webhook stub: `POST /api/billing/webhook`.
 
 ## Scripts
 

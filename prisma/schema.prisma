@@ -1,0 +1,209 @@
+// Thunder Studio — Phase 1 persistence (Postgres)
+// Aligns with Launch Roadmap §5 minimum data model.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Plan {
+  FREE
+  CREATOR_PRO
+}
+
+enum SubscriptionStatus {
+  NONE
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model User {
+  id            String   @id @default(cuid())
+  clerkId       String?  @unique
+  email         String?  @unique
+  displayName   String?
+  /// Dev / API-token stub identity when Clerk is unset
+  apiSubject    String?  @unique
+  plan          Plan     @default(FREE)
+  stripeCustomerId String? @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  memberships   WorkspaceMember[]
+  subscription  Subscription?
+}
+
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  plan        Plan     @default(FREE)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     WorkspaceMember[]
+  brandKits   BrandKit[]
+  audienceSources AudienceSource[]
+  audienceTwins   AudienceTwin[]
+  projects    Project[]
+  subscription Subscription?
+}
+
+model WorkspaceMember {
+  id          String        @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        WorkspaceRole @default(OWNER)
+  createdAt   DateTime      @default(now())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+}
+
+model BrandKit {
+  id               String   @id @default(cuid())
+  workspaceId      String
+  name             String
+  voiceSummary     String   @default("")
+  primaryColor     String   @default("#1B4DFF")
+  secondaryColor   String   @default("#0B1220")
+  accentColor      String   @default("#F5B942")
+  fontHeading      String   @default("Newsreader")
+  fontBody         String   @default("IBM Plex Sans")
+  /// JSON string array of prohibited claims
+  prohibitedClaims String   @default("[]")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  workspace        Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  projects         Project[]
+
+  @@index([workspaceId])
+}
+
+model AudienceSource {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  /// csv | paste | url
+  kind        String   @default("paste")
+  /// Raw comments text (normalized lines)
+  content     String
+  /// Optional original filename / URL
+  originLabel String?
+  commentCount Int     @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  twins       AudienceTwin[]
+
+  @@index([workspaceId])
+}
+
+model AudienceTwin {
+  id          String   @id @default(cuid())
+  workspaceId String
+  sourceId    String?
+  name        String
+  version     Int      @default(1)
+  /// JSON: Segment[] from analysis
+  segmentsJson String
+  /// Optional link back to the run that produced this twin
+  analysisRunId String? @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  source      AudienceSource? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  analysisRun AnalysisRun? @relation(fields: [analysisRunId], references: [id], onDelete: SetNull)
+  projects    Project[]
+
+  @@index([workspaceId])
+  @@index([sourceId])
+}
+
+model Project {
+  id            String   @id @default(cuid())
+  workspaceId   String
+  brandKitId    String?
+  audienceTwinId String?
+  title         String
+  creatorContext String  @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  brandKit      BrandKit? @relation(fields: [brandKitId], references: [id], onDelete: SetNull)
+  audienceTwin  AudienceTwin? @relation(fields: [audienceTwinId], references: [id], onDelete: SetNull)
+  drafts        DraftVersion[]
+  runs          AnalysisRun[]
+
+  @@index([workspaceId])
+  @@index([brandKitId])
+}
+
+model DraftVersion {
+  id          String   @id @default(cuid())
+  projectId   String
+  label       String   @default("draft")
+  body        String
+  isOptimized Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  runs        AnalysisRun[]
+
+  @@index([projectId])
+}
+
+model AnalysisRun {
+  id            String   @id @default(cuid())
+  projectId     String
+  draftVersionId String?
+  mode          String
+  confidence    String?
+  /// Full AnalyzeResult JSON (bounded)
+  resultJson    String
+  /// Compact cost / model / trace metadata
+  metaJson      String   @default("{}")
+  createdAt     DateTime @default(now())
+
+  project       Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  draftVersion  DraftVersion? @relation(fields: [draftVersionId], references: [id], onDelete: SetNull)
+  twin          AudienceTwin?
+
+  @@index([projectId, createdAt])
+}
+
+/// Stripe Customer + Subscription foundation (test-mode ready)
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String?            @unique
+  workspaceId          String?            @unique
+  stripeCustomerId     String?            @unique
+  stripeSubscriptionId String?            @unique
+  plan                 Plan               @default(FREE)
+  status               SubscriptionStatus @default(NONE)
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  user                 User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace            Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}

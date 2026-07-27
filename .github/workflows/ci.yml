@@ -36,6 +36,7 @@ jobs:
         env:
           FORCE_SEEDED_DEMO: "true"
           THUNDER_ENABLE_FALLBACK: "true"
+          DATABASE_URL: postgresql://thunder:thunder@127.0.0.1:5432/thunder
 
   # Optional smoke: build only (Playwright needs a running server + browsers;
   # full e2e stays local / manual unless secrets-free smoke is added later).
@@ -64,3 +65,4 @@ jobs:
           FORCE_SEEDED_DEMO: "true"
           THUNDER_ENABLE_FALLBACK: "true"
           NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
+          DATABASE_URL: postgresql://thunder:thunder@127.0.0.1:5432/thunder

@@ -1,0 +1,23 @@
+# Optional local Postgres for Thunder Studio (Phase 1)
+# Usage: docker compose up -d
+# Then: DATABASE_URL=postgresql://thunder:thunder@127.0.0.1:5432/thunder npx prisma migrate deploy
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: thunder
+      POSTGRES_PASSWORD: thunder
+      POSTGRES_DB: thunder
+    volumes:
+      - thunder_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U thunder -d thunder"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  thunder_pg:

@@ -20,8 +20,8 @@ This repo ships the working preflight lab today. **Studio / Media / Publish** la
 | Layer | Status |
 |-------|--------|
 | Preflight lab (6 stages, LangGraph jury, TS scores) | **Shipped** — public demo |
-| Harden (Redis limits, auth foundation, CI, Terms/Privacy) | **Phase 0** — this release |
-| Studio (accounts, Postgres, twins, billing) | Building — Phase 1 |
+| Harden (Redis limits, auth foundation, CI, Terms/Privacy) | **Phase 0** — shipped |
+| Studio (accounts, Postgres, twins, billing) | **Phase 1** — shipped (needs `DATABASE_URL`) |
 | Media (carousel assets, VO, Remotion/FFmpeg, S3) | Later — Phase 2 |
 | Publish (ZIP → OAuth platforms) | Later — Phase 3 |
 | Teams / Circles / Network | Later — Phases 4–6 |
@@ -86,6 +86,8 @@ normalize → audience → evidence → juror×3 (parallel) → critic
 | fal.ai | Optional LM fallback + cover image | Cover needs `FAL_KEY` |
 | Upstash Redis | Shared rate limits | Optional; in-memory fallback |
 | Clerk / API token | Auth on costly routes | Optional foundation |
+| Postgres (Prisma) | Studio persistence | Optional — Studio 503 without `DATABASE_URL` |
+| Stripe | Creator Pro billing stub | Optional test-mode webhook |
 | Firecrawl | Optional source URL scrape | Optional |
 | ElevenLabs | Optional voiceover audio | Optional |
 | n8n | Approve & send webhook | Optional |
@@ -103,6 +105,7 @@ flowchart TB
   LG --> Score[Deterministic_TS_scoring]
   Next --> Redis[Redis_or_memory_limits]
   Next --> Auth[Clerk_or_token_optional]
+  Next --> PG[(Postgres_Studio)]
   Next --> FalImg[fal_flux_cover]
   Next --> Eleven[ElevenLabs_optional]
   Next --> N8N[n8n_webhook_optional]
@@ -119,6 +122,23 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) → **Load seeded demo** → **Run Audience Test**. No paid keys required for the seeded path. Click the Thunder logo anytime to reset to stage 1.
+
+## Thunder Studio (Phase 1)
+
+Persisted projects, analysis runs, reusable audience twins, brand kits, and CSV comment import.
+
+```bash
+# Optional local Postgres
+docker compose up -d
+# .env.local
+DATABASE_URL=postgresql://thunder:thunder@127.0.0.1:5432/thunder
+npx prisma migrate deploy
+npm run dev
+```
+
+Open [/studio](http://localhost:3000/studio). Without `DATABASE_URL`, the preflight lab at `/` still works; Studio APIs return **503** with a clear message.
+
+**Billing:** Free = 5 saved runs/month; Creator Pro = higher cap. Stripe Customer/Subscription schema + `/api/billing/webhook` stub — no Stripe keys required for local seeded demo.
 
 ## Testing
 
@@ -157,7 +177,7 @@ Do **not** share: API keys, `.env.local`, Render dashboard secrets.
 
 **Production:** [https://thunder-psio.onrender.com](https://thunder-psio.onrender.com)
 
-Render blueprint: [`render.yaml`](render.yaml) (health check `/api/health`). Set `OPENAI_API_KEY` and `NEXT_PUBLIC_APP_URL=https://thunder-psio.onrender.com`, plus optional Upstash Redis, Clerk, and `SENTRY_DSN` in the dashboard — never commit secrets.
+Render blueprint: [`render.yaml`](render.yaml) (health check `/api/health`). Set `OPENAI_API_KEY` and `NEXT_PUBLIC_APP_URL=https://thunder-psio.onrender.com`, plus optional Upstash Redis, Clerk, `DATABASE_URL` (Neon), Stripe, and `SENTRY_DSN` in the dashboard — never commit secrets. After setting Postgres: `npx prisma migrate deploy`.
 
 Step-by-step: [docs/developer-setup.md](docs/developer-setup.md)
 

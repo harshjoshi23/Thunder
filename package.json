@@ -4,20 +4,25 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run db:generate && next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "test:e2e:update": "playwright test --update-snapshots"
+    "test:e2e:update": "playwright test --update-snapshots",
+    "db:generate": "DATABASE_URL=\"${DATABASE_URL:-postgresql://thunder:thunder@127.0.0.1:5432/thunder}\" prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "postinstall": "npm run db:generate"
   },
   "dependencies": {
     "@clerk/backend": "^3.13.2",
     "@fal-ai/client": "^1.10.1",
     "@langchain/core": "^1.2.3",
     "@langchain/langgraph": "^1.4.8",
+    "@prisma/client": "^6.19.0",
     "@upstash/redis": "^1.38.0",
     "clsx": "^2.1.1",
     "lucide-react": "^1.26.0",
@@ -38,6 +43,7 @@
     "@vitejs/plugin-react": "^6.0.4",
     "eslint": "^9",
     "eslint-config-next": "15.3.5",
+    "prisma": "^6.19.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.10"

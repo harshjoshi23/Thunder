@@ -6,11 +6,11 @@ Public tracker for Thunder OS build phases. Private strategy Word docs live in `
 **Repo:** [https://github.com/harshjoshi23/Thunder](https://github.com/harshjoshi23/Thunder)  
 **Roadmap issue:** [Issue #1](https://github.com/harshjoshi23/Thunder/issues/1) (if present)
 
-Architecture target over time: **Postgres + Redis + S3 + Clerk**. Phase 0 is Harden only.
+Architecture target over time: **Postgres + Redis + S3 + Clerk**.
 
 ---
 
-## Phase 0 — Harden — DONE (code shipped)
+## Phase 0 — Harden — DONE
 
 | Item | Status | Notes |
 |------|--------|--------|
@@ -21,19 +21,33 @@ Architecture target over time: **Postgres + Redis + S3 + Clerk**. Phase 0 is Har
 | Terms + Privacy | Done | `/terms`, `/privacy` |
 | Sentry | Stub | `SENTRY_DSN` env; install `@sentry/nextjs` when ready |
 | README personal-product framing | Done | Demo path preserved |
-| Product repo fork | Deferred | Continue in this repo; fork steps in `docs/newThunder/README.md` (local) |
-
-**Gate (you verify):** no uncontrolled spend, no high-severity secret leak, stable public demo after you set Redis/rotate keys.
 
 ---
 
-## Next — Phase 1 Studio (not started)
+## Phase 1 — Studio — DONE (code shipped)
 
-Accounts + Postgres, projects / twins / brand kits, CSV import, Stripe Free vs Creator Pro.
+| Item | Status | Notes |
+|------|--------|--------|
+| Postgres schema (Prisma) | Done | User, Workspace, BrandKit, AudienceSource, AudienceTwin, Project, DraftVersion, AnalysisRun, Subscription |
+| Migrations checked in | Done | `prisma/migrations/` — run `npx prisma migrate deploy` |
+| Studio APIs | Done | `/api/studio/*` projects, runs, twins, brand-kits, CSV import, entitlement |
+| Studio UI | Done | `/studio` + `/studio/[id]` — main `/` demo unchanged |
+| CSV → AudienceSource | Done | `POST /api/studio/import/csv` |
+| Billing stub | Done | Free (5 runs/mo) vs Creator Pro; Stripe webhook stub |
+| DB missing → 503 | Done | App builds without `DATABASE_URL`; Studio APIs clear 503 |
+| Optional local Postgres | Done | `docker-compose.yml` |
+| Unit tests | Done | entitlement + CSV parse (no live DB / no OpenAI) |
+
+**Gate (you verify with real users later):** 20 users × 2+ runs; ~30% weekly return.
+
+---
+
+## Next — Phase 2 Media (not started)
+
+PNG/PDF carousel, VO/subs, Remotion/FFmpeg reel worker, S3 assets → then private-repo gate.
 
 ## Later
 
-- Phase 2 Media — PNG/PDF, VO/subs, Remotion/FFmpeg, S3 → then private-repo gate  
 - Phase 3 Publish — ZIP first, then OAuth (TikTok → YT → IG)  
 - Phase 4 Teams → Phase 5 Circles → Phase 6 Network  
 - Mobile (Expo) after Media + a publish path  
@@ -42,7 +56,8 @@ Accounts + Postgres, projects / twins / brand kits, CSV import, Stripe Free vs C
 
 ## You must do (ops)
 
-1. Rotate any OpenAI key that may have been exposed; set a hard provider budget  
-2. On Render: set `NEXT_PUBLIC_APP_URL`, Upstash Redis URL/token, optional Clerk + `SENTRY_DSN`  
-3. Confirm `/api/health` shows `redisConfigured` / `authConfigured` as expected  
-4. Keep sharing the seeded demo path for no-cost trials  
+1. Create Neon (or Render Postgres) → set `DATABASE_URL` on Render  
+2. Run migrations: `npx prisma migrate deploy` (or build hook / one-off shell)  
+3. Optional: Clerk keys if locking Studio/costly APIs; Stripe test keys for live billing  
+4. Confirm `/api/health` shows `databaseConfigured: true` after deploy  
+5. Keep sharing the seeded demo path for no-cost trials  

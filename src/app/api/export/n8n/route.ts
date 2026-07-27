@@ -3,11 +3,20 @@ import {
   buildN8nPayload,
   N8nExportRequestSchema,
 } from "@/lib/n8n/payload";
+import {
+  checkRateLimit,
+  rateLimitResponse,
+} from "@/lib/security/rate-limit";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
+    const limited = checkRateLimit(request, "n8n-export", { limit: 20 });
+    if (!limited.ok) {
+      return rateLimitResponse(limited.retryAfterSec);
+    }
+
     const json: unknown = await request.json();
     const parsed = N8nExportRequestSchema.safeParse(json);
     if (!parsed.success) {

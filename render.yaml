@@ -58,5 +58,9 @@ services:
         sync: false
       - key: ANALYZE_TIMEOUT_MS
         value: "90000"
+      - key: THUNDER_RATE_LIMIT
+        value: "8"
+      - key: THUNDER_RATE_WINDOW_MS
+        value: "3600000"
       - key: FORCE_SEEDED_DEMO
         value: "false"

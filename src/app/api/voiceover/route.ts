@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { withTimeout } from "@/lib/timeouts";
+import {
+  checkRateLimit,
+  rateLimitResponse,
+} from "@/lib/security/rate-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -11,6 +15,11 @@ const VoiceoverRequestSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const limited = checkRateLimit(request, "voiceover", { limit: 8 });
+    if (!limited.ok) {
+      return rateLimitResponse(limited.retryAfterSec);
+    }
+
     const json: unknown = await request.json();
     const parsed = VoiceoverRequestSchema.safeParse(json);
     if (!parsed.success) {

@@ -117,6 +117,15 @@ npm run test:e2e   # Playwright — forced seeded/fallback, no credit burn
 - Cover / voice / n8n stay recovery until their keys/webhooks exist
 - No Instagram / TikTok / Reddit / Twitter native OAuth posting
 - Without OpenAI or fal language keys, runs are Seeded demo / Recovery fallback — never fake Live
+- Public demo has **no login**; costly routes are **rate-limited per IP**. Set an OpenAI usage budget. Rotate keys if they were ever pasted in chat.
+
+## Sharing (LinkedIn / friends)
+
+Safe to share:
+- Live demo: [https://thunder-psio.onrender.com](https://thunder-psio.onrender.com)
+- GitHub: [https://github.com/harshjoshi23/Thunder](https://github.com/harshjoshi23/Thunder)
+
+Do **not** share: API keys, `.env.local`, Render dashboard secrets, or private Discord coupons.
 
 ## Deploy
 

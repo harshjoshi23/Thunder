@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { generateCoverImage } from "@/lib/fal/image";
 import { getFalImageModel } from "@/lib/fal/config";
+import {
+  checkRateLimit,
+  rateLimitResponse,
+} from "@/lib/security/rate-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -13,6 +17,11 @@ const CoverRequestSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const limited = checkRateLimit(request, "cover", { limit: 10 });
+    if (!limited.ok) {
+      return rateLimitResponse(limited.retryAfterSec);
+    }
+
     const json: unknown = await request.json();
     const parsed = CoverRequestSchema.safeParse(json);
     if (!parsed.success) {

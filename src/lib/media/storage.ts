@@ -66,7 +66,7 @@ export async function putObject(
 
   if (isS3Configured()) {
     // Interface ready: prefer official SDK when product keys are present.
-    // Without aws-sdk dependency in Phase 2, fall through with a documented stub
+    // Without aws-sdk: fall through to local filesystem store
     // that still writes locally and labels backend for ops to swap.
     console.warn(
       "[thunder:media] S3_BUCKET set but SDK upload not bundled yet — writing local fallback. Wire @aws-sdk/client-s3 for production R2/S3.",

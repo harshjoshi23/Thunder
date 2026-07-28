@@ -1,37 +1,53 @@
-# Thunder (Hackathon Edition)
+# Thunder
 
 **Test your post before your audience does.**
 
-Thunder is a pre-publication **audience intelligence** lab for creators. Paste historical comments and a draft; Thunder builds an evidence-backed audience twin, runs a multi-agent rehearsal, scores the draft with transparent TypeScript formulas, and returns an improved five-slide carousel (plus optional media ZIP export).
+Thunder is a pre-publication **audience intelligence** product for creators. You paste historical audience comments and a draft post. Thunder builds an evidence-backed model of that audience, rehearses how different segments may react, scores the draft with transparent formulas, and returns an improved five-slide carousel you can export.
 
-> Grounded simulation from *your* comments. Not a view predictor. Not a virality or revenue guarantee.
+It does **not** predict views, virality, revenue, or exact human behaviour. It is a grounded rehearsal from *your* imported comments — not a social network and not a fake analytics oracle.
 
 **Live demo:** [https://thunder-psio.onrender.com](https://thunder-psio.onrender.com)  
-(Cold start on free hosting can take ~30–60s. Use **Load seeded demo** → **Run Audience Test**.)
+Cold start on free hosting can take ~30–60 seconds. Use **Load seeded demo**, then **Run Audience Test**.
 
 ![Thunder Audience Data](docs/images/01-audience-data.png)
 
-## What Thunder does
+---
 
-1. Import historical audience comments (+ short creator context)  
-2. Build **three** evidence-linked audience segments  
-3. Rehearse the draft with three juror perspectives + a critic  
-4. Show deterministic diagnostics and guardrails  
-5. Generate an improved five-slide carousel and supporting evidence  
-6. Optionally export a media package (PNG / PDF / VTT ZIP)
+## Product flow
 
-Every completed run is labeled **Live**, **Imported**, **Seeded demo**, or **Recovery fallback** — never silently faked as live.
+```text
+Historical comments
+  → three evidence-backed audience segments
+  → your draft
+  → three simulated audience reactions
+  → transparent diagnostic scores + guardrails
+  → improved five-slide carousel
+  → optional media ZIP export
+```
 
-## Working flow (6 stages)
+### Stages in the app
 
-| Stage | What you see |
+| Stage | What you get |
 |-------|----------------|
-| Audience Data | Comments, context, draft, optional URL fetch |
-| Audience Twin | Three segments with evidence IDs |
-| Reaction Lab | Disagreement across segments |
-| Diagnostics | Transparent scores + guardrails |
-| Carousel | Improved slides + **Export media package** |
-| Before / After | Score deltas + credibility |
+| **Audience Data** | Paste comments, creator context, draft; optional URL fetch |
+| **Audience Twin** | Exactly three segments, each tied to comment evidence IDs |
+| **Reaction Lab** | How each segment understands, values, and challenges the draft |
+| **Diagnostics** | Fit, clarity, save/discussion signals, misinterpretation risk |
+| **Carousel** | Improved hook, five slides, caption, CTA; export ZIP |
+| **Before / After** | Score deltas and credibility panel |
+
+### Mode labels (always visible)
+
+| Mode | Meaning |
+|------|---------|
+| **Live** | Language models ran successfully on your inputs |
+| **Imported** | Comments arrived via a validated evidence package |
+| **Seeded demo** | Built-in sample path for demos (no paid API required) |
+| **Recovery fallback** | Missing keys or a pipeline error — same UI, clearly not Live |
+
+Never treat Seeded or Recovery as Live audience truth.
+
+---
 
 ## Screenshots
 
@@ -45,7 +61,21 @@ Every completed run is labeled **Live**, **Imported**, **Seeded demo**, or **Rec
 | Carousel | ![carousel](docs/images/08-carousel-slides.png) |
 | Before / After | ![before-after](docs/images/09-before-after.png) |
 
-## Local setup
+---
+
+## How it works (technical summary)
+
+- **App:** Next.js (App Router) + TypeScript + Tailwind  
+- **Orchestration:** LangGraph.js — normalize comments → audience research → evidence check → three parallel jurors → critic → TypeScript scoring → strategy → verify  
+- **Language:** OpenAI when `OPENAI_API_KEY` is set; otherwise fal.ai `any-llm` if `FAL_KEY` is set  
+- **Scores:** LLM rates factors 0–10; final 0–100 diagnostics are **deterministic TypeScript** (see [`docs/SCORING.md`](docs/SCORING.md))  
+- **Evidence:** Comment IDs (`C01`…) only — invalid citations are repaired or retried  
+- **Export:** PNG slides + PDF + subtitles/VTT storyboard in a downloadable ZIP  
+- **Optional:** Studio (`/studio`) with Postgres, cover (fal), voiceover (ElevenLabs), Firecrawl source fetch, n8n webhook  
+
+---
+
+## Quick start
 
 ```bash
 cp .env.example .env.local
@@ -55,39 +85,50 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) → **Load seeded demo** → **Run Audience Test**.
 
-Optional Studio (Postgres): set `DATABASE_URL`, run `npx prisma migrate deploy`, open `/studio`.
-
-### Environment variables
-
-Copy names from [`.env.example`](.env.example). Never commit real keys.
-
-Minimum for Live language: `OPENAI_API_KEY` (or `FAL_KEY`).  
-Without a language key, Seeded demo / Recovery fallback still works when fallback is enabled.
-
-### Commands
+### Useful commands
 
 ```bash
 npm run lint
 npm run typecheck
 npm test
 npm run build
-npm run start
-npm run test:e2e   # Playwright; forced seeded path
+npm start
 ```
 
-## Current limitations
+### Environment
 
-- Does not predict views, virality, or revenue  
-- Does not post to Instagram / TikTok / YouTube / LinkedIn  
-- Optional Studio / Redis / S3 / Clerk / Stripe need env configuration  
-- Cover, voiceover, Firecrawl, and n8n degrade to labeled recovery without keys  
-- S3 upload interface is prepared; local `.data/exports` is the default ZIP store  
+Copy variable **names** from [`.env.example`](.env.example). Never commit real keys.
 
-## What comes next
+| Need | Variables |
+|------|-----------|
+| Live language path | `OPENAI_API_KEY` (preferred) or `FAL_KEY` |
+| Live cover images | `FAL_KEY` |
+| Voiceover | `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID` |
+| Optional URL scrape | `FIRECRAWL_API_KEY` |
+| Optional Studio | `DATABASE_URL` then `npx prisma migrate deploy` |
+| Optional shared rate limits | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
 
-Next: additional content sources, stronger audience calibration, and optional creator-workflow integrations — in a **separate production repository**. This repo remains the stable Hackathon Edition.
+Without a language key, Seeded demo / Recovery fallback still work when fallback is enabled (`THUNDER_ENABLE_FALLBACK`).
 
-Engineering handoff: [`docs/THUNDER_KNOWLEDGE_PACK.md`](docs/THUNDER_KNOWLEDGE_PACK.md) · Evidence contract: [`docs/INTEGRATION_CONTRACT.md`](docs/INTEGRATION_CONTRACT.md) · Scoring: [`docs/SCORING.md`](docs/SCORING.md)
+More setup detail: [`docs/developer-setup.md`](docs/developer-setup.md) · simple English: [`docs/EXPLAINER.md`](docs/EXPLAINER.md)
+
+---
+
+## Studio and export (optional)
+
+- **Studio** (`/studio`): save projects and runs when Postgres (`DATABASE_URL`) is configured. The main lab on `/` works without a database.  
+- **Export media package:** from the Carousel stage (or a Studio run). ZIP includes slide PNGs, PDF, VTT, captions, and a reel helper script.  
+
+---
+
+## Honest limits
+
+- Not a view / virality / revenue predictor  
+- Does not post to Instagram, TikTok, YouTube, or LinkedIn  
+- Segments describe communication patterns from **imported comments**, not medical, political, or private-identity profiling  
+- Optional integrations degrade with a clear Recovery label when keys are missing  
+
+---
 
 ## Licence
 

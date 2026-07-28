@@ -1,4 +1,4 @@
-# Optional local Postgres for Thunder Studio (Phase 1)
+# Optional local Postgres for Thunder Studio
 # Usage: docker compose up -d
 # Then: DATABASE_URL=postgresql://thunder:thunder@127.0.0.1:5432/thunder npx prisma migrate deploy
 

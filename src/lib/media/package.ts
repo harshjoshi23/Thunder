@@ -163,7 +163,7 @@ export async function buildMediaPackage(
     `Aspect: ${aspect.label} (${aspect.width}×${aspect.height})`,
     payload.mode ? `Analysis mode: ${payload.mode}` : "",
     "",
-    "MP4 is optional. The ZIP itself is the releasable Phase 2 package.",
+    "MP4 is optional. Use compose-reel.sh when ffmpeg is installed.",
     "",
   ]
     .filter(Boolean)

@@ -1,4 +1,4 @@
-/** Brand tokens for carousel / PDF rendering (Phase 2). */
+/** Brand tokens for carousel / PDF rendering. */
 export type BrandTokens = {
   primaryColor: string;
   secondaryColor: string;

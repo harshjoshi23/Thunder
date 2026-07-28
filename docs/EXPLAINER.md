@@ -15,6 +15,7 @@ No login. No native social posting.
 | Badge | When |
 |-------|------|
 | **Live** | Language agents succeeded with OpenAI (or fal LM fallback) |
+| **Imported** | Comments provided via validated evidence package |
 | **Seeded demo** | Load seeded demo / force demo |
 | **Recovery fallback** | Missing keys or pipeline error — same UI, clearly not Live |
 

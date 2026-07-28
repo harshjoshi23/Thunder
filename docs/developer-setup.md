@@ -45,7 +45,7 @@ Copy `.env.example` → `.env.local` and fill what you need:
 
 Studio routes: `/api/studio/projects`, `/runs`, `/twins`, `/brand-kits`, `/import/csv`, `/entitlement`. Billing webhook stub: `POST /api/billing/webhook`.
 
-## Media package (Phase 2)
+## Media package
 
 ```bash
 # From Carousel UI: Export media package

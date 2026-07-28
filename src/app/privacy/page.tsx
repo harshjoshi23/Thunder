@@ -27,17 +27,16 @@ export default function PrivacyPage() {
           <h2 className="font-semibold text-fg">What you submit</h2>
           <p className="mt-2">
             Comments, creator context, drafts, and optional source URLs are sent to
-            the server to run analysis. In the current Phase 0 harden release,
-            runs are primarily request-scoped (not a full multi-user Postgres
-            studio yet). Do not paste secrets or private credentials into comment
-            fields.
+            the server to run analysis. Without Studio / Postgres configured, runs
+            are primarily request-scoped. Do not paste secrets or private credentials
+            into comment fields.
           </p>
         </section>
         <section>
           <h2 className="font-semibold text-fg">Third-party processors</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5">
             <li>OpenAI / fal.ai — language and optional cover images when keys are set</li>
-            <li>Firecrawl / ElevenLabs / n8n — optional scrape, voice, handoff</li>
+            <li>Firecrawl / ElevenLabs / n8n — optional scrape, voice, export webhook</li>
             <li>Clerk — authentication when enabled</li>
             <li>Upstash Redis — shared rate limits when configured</li>
             <li>Sentry — error monitoring when <code>SENTRY_DSN</code> is set</li>
@@ -45,11 +44,11 @@ export default function PrivacyPage() {
           </ul>
         </section>
         <section>
-          <h2 className="font-semibold text-fg">Accounts (coming)</h2>
+          <h2 className="font-semibold text-fg">Saved projects (Studio)</h2>
           <p className="mt-2">
-            Phase 1 Studio will add saved projects and account-backed data in
-            Postgres. Until then, treat the public demo as ephemeral unless you
-            export results yourself.
+            When <code>DATABASE_URL</code> is configured, Studio may store projects,
+            runs, and related metadata in Postgres. Until then, treat the public demo
+            as ephemeral unless you export results yourself.
           </p>
         </section>
         <section>

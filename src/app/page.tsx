@@ -255,7 +255,7 @@ export default function HomePage() {
             Thunder runs a grounded scenario simulation based on patterns in the
             creator’s supplied audience data. It does not predict real humans
             perfectly, guarantee virality, or produce scientific view forecasts.
-            Modes are labeled Live / Seeded demo / Recovery fallback — never
+            Modes are labeled Live / Imported / Seeded demo / Recovery fallback — never
             silently faked as live.
           </p>
           <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1">

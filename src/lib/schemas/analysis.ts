@@ -240,6 +240,7 @@ export type Confidence = z.infer<typeof ConfidenceSchema>;
 
 export const RunModeSchema = z.enum([
   "live",
+  "imported",
   "seeded_demo",
   "recovery_fallback",
 ]);

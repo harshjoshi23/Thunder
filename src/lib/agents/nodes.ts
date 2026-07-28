@@ -20,6 +20,12 @@ import { runJuror } from "./juror";
 import { runCritic } from "./critic";
 import { runStrategy } from "./strategy";
 import type { ThunderGraphState } from "./state";
+import type { RunMode } from "@/lib/schemas";
+
+/** Live LLM path modes (as opposed to seeded/recovery mocks). */
+function isLanguageLiveMode(mode: RunMode): boolean {
+  return mode === "live" || mode === "imported";
+}
 
 function trace(
   node: string,
@@ -81,7 +87,7 @@ export async function audienceResearchNode(
     });
     return {
       segments: data.segments,
-      mode: "live",
+      mode: isLanguageLiveMode(state.mode) ? state.mode : "live",
       modelsUsed: { audience: model },
       agentTrace: [`audienceResearch (${model})`],
       executionTrace: [
@@ -105,7 +111,7 @@ export async function audienceResearchNode(
 export async function evidenceValidateNode(
   state: ThunderGraphState,
 ): Promise<Partial<ThunderGraphState>> {
-  if (state.mode !== "live" || state.segments.length !== 3) {
+  if (!isLanguageLiveMode(state.mode) || state.segments.length !== 3) {
     return {
       needsRetry: false,
       agentTrace: ["evidenceValidate skipped"],
@@ -177,7 +183,7 @@ async function jurorNode(
   index: number,
 ): Promise<Partial<ThunderGraphState>> {
   const nodeName = `juror${index + 1}`;
-  if (state.mode !== "live" || state.segments.length !== 3) {
+  if (!isLanguageLiveMode(state.mode) || state.segments.length !== 3) {
     return {
       agentTrace: [`${nodeName} skipped`],
       executionTrace: [trace(nodeName, "skip")],
@@ -243,7 +249,7 @@ export async function juror3Node(
 export async function criticNode(
   state: ThunderGraphState,
 ): Promise<Partial<ThunderGraphState>> {
-  if (state.mode !== "live" || state.segments.length !== 3) {
+  if (!isLanguageLiveMode(state.mode) || state.segments.length !== 3) {
     return {
       agentTrace: ["criticPass skipped"],
       executionTrace: [trace("criticPass", "skip")],
@@ -335,7 +341,7 @@ export async function originalScoringNode(
 export async function strategyNode(
   state: ThunderGraphState,
 ): Promise<Partial<ThunderGraphState>> {
-  if (state.mode !== "live" || !state.call1 || !state.originalDiagnostics) {
+  if (!isLanguageLiveMode(state.mode) || !state.call1 || !state.originalDiagnostics) {
     return {
       agentTrace: ["strategy skipped"],
       executionTrace: [trace("strategy", "skip")],
@@ -405,7 +411,7 @@ export async function finalVerifyNode(
 ): Promise<Partial<ThunderGraphState>> {
   const wantSeeded = state.forceMock || shouldForceMock();
   const liveOk =
-    state.mode === "live" &&
+    isLanguageLiveMode(state.mode) &&
     state.call1 &&
     state.call2 &&
     state.originalDiagnostics;
@@ -449,8 +455,11 @@ export async function finalVerifyNode(
     };
   }
 
+  const resultMode: RunMode =
+    state.mode === "imported" ? "imported" : "live";
+
   const result = buildAnalyzeResultFromParts({
-    mode: "live",
+    mode: resultMode,
     commentsText: state.commentsText,
     creatorContext: state.creatorContext,
     draftPost: state.draftPost,
@@ -460,15 +469,15 @@ export async function finalVerifyNode(
     agentTrace: [...state.agentTrace, "finalVerify"],
     executionTrace: [
       ...state.executionTrace,
-      trace("finalVerify", "ok", "live"),
+      trace("finalVerify", "ok", resultMode),
     ],
     modelsUsed: state.modelsUsed,
   });
 
   return {
     result,
-    agentTrace: ["finalVerify live"],
-    executionTrace: [trace("finalVerify", "ok", "live")],
+    agentTrace: [`finalVerify ${resultMode}`],
+    executionTrace: [trace("finalVerify", "ok", resultMode)],
   };
 }
 

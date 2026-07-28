@@ -51,6 +51,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# .data local exports / caches
+.data/
+public/exports/
+
 # optional local extras (hackathon PDFs already under docs/hackathon)
 *.local.md
 .tmp/

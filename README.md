@@ -22,8 +22,8 @@ This repo ships the working preflight lab today. **Studio / Media / Publish** la
 | Preflight lab (6 stages, LangGraph jury, TS scores) | **Shipped** — public demo |
 | Harden (Redis limits, auth foundation, CI, Terms/Privacy) | **Phase 0** — shipped |
 | Studio (accounts, Postgres, twins, billing) | **Phase 1** — shipped (needs `DATABASE_URL`) |
-| Media (carousel assets, VO, Remotion/FFmpeg, S3) | Later — Phase 2 |
-| Publish (ZIP → OAuth platforms) | Later — Phase 3 |
+| Media (carousel ZIP, PNG/PDF/VTT, optional ffmpeg) | **Phase 2** — shipped |
+| Publish (OAuth platforms) | Later — Phase 3 |
 | Teams / Circles / Network | Later — Phases 4–6 |
 
 Hackathon submission materials remain under [`docs/submission/`](docs/submission/) for history; the product line continues here.
@@ -38,7 +38,7 @@ Creators publish into silence or backlash because they only learn audience react
 2. Build a three-segment audience twin grounded in comment evidence IDs  
 3. Run three parallel juror personas + an adversarial critic  
 4. Score original vs optimized drafts with deterministic formulas  
-5. Export carousel (optional cover / voiceover / n8n handoff)
+5. Export carousel **media package** (PNG/PDF/VTT ZIP) + optional cover / voiceover / n8n handoff
 
 ## Product surface (6 stages)
 
@@ -48,7 +48,7 @@ Creators publish into silence or backlash because they only learn audience react
 | Audience Twin | Three evidence-linked segments |
 | Reaction Lab | Disagreement across segments |
 | Diagnostics | Deterministic scores + guardrails |
-| Carousel | Optimized slides + optional cover/voice/n8n |
+| Carousel | Optimized slides + **Export media package** + cover/voice/n8n |
 | Before / After | Score deltas + credibility panel |
 
 ## Screenshots (real product UI)
@@ -86,11 +86,13 @@ normalize → audience → evidence → juror×3 (parallel) → critic
 | fal.ai | Optional LM fallback + cover image | Cover needs `FAL_KEY` |
 | Upstash Redis | Shared rate limits | Optional; in-memory fallback |
 | Clerk / API token | Auth on costly routes | Optional foundation |
-| Postgres (Prisma) | Studio persistence | Optional — Studio 503 without `DATABASE_URL` |
+| Postgres (Prisma) | Studio + MediaAsset persistence | Optional — Studio 503 without `DATABASE_URL` |
 | Stripe | Creator Pro billing stub | Optional test-mode webhook |
+| S3 / R2 | Media ZIP storage | Optional — local `.data/exports` fallback |
 | Firecrawl | Optional source URL scrape | Optional |
 | ElevenLabs | Optional voiceover audio | Optional |
 | n8n | Approve & send webhook | Optional |
+| ffmpeg | Optional MP4 from slide PNGs | Local/Render when installed (`npm run media:reel`) |
 | Sentry | Error monitoring | Env stub (`SENTRY_DSN`) |
 
 ## Architecture (today → target)
@@ -106,12 +108,25 @@ flowchart TB
   Next --> Redis[Redis_or_memory_limits]
   Next --> Auth[Clerk_or_token_optional]
   Next --> PG[(Postgres_Studio)]
+  Next --> Media["/api/media/package"]
+  Media --> Exports[Local_or_S3_ZIP]
   Next --> FalImg[fal_flux_cover]
   Next --> Eleven[ElevenLabs_optional]
   Next --> N8N[n8n_webhook_optional]
 ```
 
 Target over phases: **Postgres + Redis + S3 + Clerk**, workers for media/publish. Details: [docs/architecture.md](docs/architecture.md) · setup: [docs/developer-setup.md](docs/developer-setup.md)
+
+### Media package (Phase 2)
+
+After a carousel run, click **Export media package** (or Studio → run → Export). You get a ZIP with:
+
+- Five slide **PNGs** (+ SVG) using brand kit colors when available  
+- **PDF** of the five-slide strategy  
+- **VTT** + `captions.json` from voiceover script timings (even without ElevenLabs audio)  
+- `storyboard.json` + `compose-reel.sh` for optional **ffmpeg** MP4  
+
+Local/dev stores under `.data/exports` and serves via `/api/media/files/...`. Set `S3_BUCKET` + keys for R2/S3 when ready.
 
 ## Quick start (seeded demo)
 

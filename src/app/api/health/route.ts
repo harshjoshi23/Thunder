@@ -32,6 +32,11 @@ export async function GET() {
     databaseConfigured: isDatabaseConfigured(),
     stripeConfigured: Boolean(process.env.STRIPE_SECRET_KEY?.trim()),
     sentryConfigured: isSentryConfigured(),
+    s3Configured: Boolean(
+      process.env.S3_BUCKET?.trim() &&
+        (process.env.S3_ACCESS_KEY_ID?.trim() ||
+          process.env.AWS_ACCESS_KEY_ID?.trim()),
+    ),
     fallbackEnabled:
       process.env.THUNDER_ENABLE_FALLBACK !== "false" &&
       process.env.THUNDER_ENABLE_FALLBACK !== "0",

@@ -86,3 +86,18 @@ services:
         sync: false
       - key: STRIPE_PRICE_CREATOR_PRO
         sync: false
+      # Phase 2 Media — optional object storage (local .data/exports fallback)
+      - key: MEDIA_EXPORT_DIR
+        sync: false
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_REGION
+        value: "auto"
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: S3_PUBLIC_BASE_URL
+        sync: false

@@ -28,8 +28,10 @@ Copy `.env.example` → `.env.local` and fill what you need:
 | `DATABASE_URL` | Postgres for Thunder Studio (Neon or `docker compose`). Without it, Studio APIs return **503**; `/` demo still works |
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` / `STRIPE_PRICE_CREATOR_PRO` | Optional billing; local demo does not need them |
 | `STRIPE_WEBHOOK_ALLOW_UNSIGNED` | Local stub only (`true`) — never on Render |
+| `MEDIA_EXPORT_DIR` | Optional override for local ZIP root (default `.data/exports`) |
+| `S3_BUCKET` / `S3_ENDPOINT` / `S3_REGION` / `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` / `S3_PUBLIC_BASE_URL` | Optional R2/S3; without them, packages store locally and download via `/api/media/files/...` |
 
-**Auth behavior:** if Clerk secret or `THUNDER_API_TOKEN` is set, `/api/cover`, `/api/voiceover`, `/api/source`, `/api/export/n8n`, and live `/api/analyze` require auth. Seeded / no-language-key analyze stays open (no paid LM burn). If auth env is unset, the public demo path stays open with rate limits only. Studio uses the same auth foundation, or a local `dev-local` workspace stub when auth is unset.
+**Auth behavior:** if Clerk secret or `THUNDER_API_TOKEN` is set, `/api/cover`, `/api/voiceover`, `/api/source`, `/api/export/n8n`, `/api/media/package`, and live `/api/analyze` require auth. Seeded / no-language-key analyze stays open (no paid LM burn). If auth env is unset, the public demo path stays open with rate limits only. Studio uses the same auth foundation, or a local `dev-local` workspace stub when auth is unset.
 
 **Routing:** if `OPENAI_API_KEY` → OpenAI for language agents; else if `FAL_KEY` → fal `any-llm`; else Seeded demo / Recovery fallback. Cover images always need `FAL_KEY` for live Flux.
 
@@ -43,6 +45,26 @@ Copy `.env.example` → `.env.local` and fill what you need:
 
 Studio routes: `/api/studio/projects`, `/runs`, `/twins`, `/brand-kits`, `/import/csv`, `/entitlement`. Billing webhook stub: `POST /api/billing/webhook`.
 
+## Media package (Phase 2)
+
+```bash
+# From Carousel UI: Export media package
+# Or API (inline strategy — no DB required):
+curl -s -X POST http://localhost:3000/api/media/package \
+  -H 'Content-Type: application/json' \
+  -d @- <<'JSON'
+{ "hook":"…", "slides":[{ "title":"…", "body":"…" }, …5], "caption":"…", "cta":"…", "voiceoverScript":"…", "mode":"seeded_demo" }
+JSON
+```
+
+ZIP includes PNG/SVG slides, PDF, VTT, captions, storyboard, and `compose-reel.sh`. Optional MP4:
+
+```bash
+# unzip the package, then:
+npm run media:reel -- /path/to/unzipped-package
+# requires ffmpeg on PATH
+```
+
 ## Scripts
 
 ```bash
@@ -53,6 +75,7 @@ npm run typecheck
 npm test
 npm run build
 npm run test:e2e
+npm run media:reel -- ./path-to-unzipped-package
 ```
 
 ## n8n approve & send

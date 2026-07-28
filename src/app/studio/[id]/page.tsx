@@ -43,6 +43,8 @@ export default function StudioProjectPage() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [selectedRun, setSelectedRun] = useState<RunRow | null>(null);
+  const [mediaMsg, setMediaMsg] = useState<string | null>(null);
+  const [mediaLoading, setMediaLoading] = useState(false);
 
   const load = useCallback(async () => {
     setError(null);
@@ -141,6 +143,39 @@ export default function StudioProjectPage() {
     setMsg(
       "Open the preflight lab (/), run an analysis, then return here and use “Run seeded & save” — or POST the result to /api/studio/runs with this projectId.",
     );
+  }
+
+  async function exportMediaForRun(run: RunRow) {
+    setMediaLoading(true);
+    setMediaMsg(null);
+    try {
+      const res = await fetch("/api/media/package", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          analysisRunId: run.id,
+          projectId,
+          includeVoiceover: false,
+        }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        downloadUrl?: string;
+        message?: string;
+        error?: string;
+      };
+      if (!res.ok || !data.downloadUrl) {
+        throw new Error(data.error ?? "Media package failed");
+      }
+      setMediaMsg(data.message ?? "Package ready.");
+      window.location.href = data.downloadUrl;
+    } catch (err) {
+      setMediaMsg(
+        err instanceof Error ? err.message : "Media export failed",
+      );
+    } finally {
+      setMediaLoading(false);
+    }
   }
 
   let selectedPreview: string | null = null;
@@ -259,18 +294,35 @@ export default function StudioProjectPage() {
                           {new Date(r.createdAt).toLocaleString()} · {r.id}
                         </p>
                       </div>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setSelectedRun(r)}
-                      >
-                        Preview
-                      </Button>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setSelectedRun(r)}
+                        >
+                          Preview
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="secondary"
+                          disabled={mediaLoading}
+                          onClick={() => void exportMediaForRun(r)}
+                          data-testid="studio-export-media"
+                        >
+                          {mediaLoading ? "Exporting…" : "Export media package"}
+                        </Button>
+                      </div>
                     </li>
                   ))}
                 </ul>
               )}
+              {mediaMsg ? (
+                <p className="mt-2 text-xs text-muted" data-testid="studio-media-msg">
+                  {mediaMsg}
+                </p>
+              ) : null}
               {selectedPreview ? (
                 <p className="mt-3 rounded-md border border-border bg-elevated px-3 py-2 font-mono text-xs">
                   {selectedPreview}

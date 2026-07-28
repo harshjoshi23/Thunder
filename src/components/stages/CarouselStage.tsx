@@ -17,6 +17,11 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
   const [voiceMsg, setVoiceMsg] = useState<string | null>(null);
   const [voiceLoading, setVoiceLoading] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [mediaMsg, setMediaMsg] = useState<string | null>(null);
+  const [mediaLoading, setMediaLoading] = useState(false);
+  const [mediaDownloadUrl, setMediaDownloadUrl] = useState<string | null>(
+    null,
+  );
 
   async function exportToN8n() {
     setExporting(true);
@@ -85,6 +90,50 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
       setCoverMsg("Cover generation failed — recovery fallback retained.");
     } finally {
       setLoadingCover(false);
+    }
+  }
+
+  async function exportMediaPackage() {
+    setMediaLoading(true);
+    setMediaMsg(null);
+    setMediaDownloadUrl(null);
+    try {
+      const res = await fetch("/api/media/package", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          hook: result.optimized.hook,
+          slides: result.optimized.slides,
+          caption: result.optimized.caption,
+          cta: result.optimized.cta,
+          voiceoverScript: result.optimized.voiceoverScript,
+          mode: result.mode,
+          confidence: result.confidence,
+          coverImageUrl: coverUrl.startsWith("http") ? coverUrl : undefined,
+          includeVoiceover: false,
+        }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        downloadUrl?: string;
+        message?: string;
+        error?: string;
+        voiceoverMode?: string;
+      };
+      if (!res.ok || !data.downloadUrl) {
+        throw new Error(data.error ?? "Media package failed");
+      }
+      setMediaDownloadUrl(data.downloadUrl);
+      setMediaMsg(
+        data.message ??
+          "Media package ready (PNG slides + PDF + VTT + storyboard).",
+      );
+    } catch (err) {
+      setMediaMsg(
+        err instanceof Error ? err.message : "Media package export failed",
+      );
+    } finally {
+      setMediaLoading(false);
     }
   }
 
@@ -170,6 +219,15 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
           </Button>
           <Button
             type="button"
+            variant="primary"
+            onClick={() => void exportMediaPackage()}
+            disabled={mediaLoading}
+            data-testid="export-media-package"
+          >
+            {mediaLoading ? "Building…" : "Export media package"}
+          </Button>
+          <Button
+            type="button"
             variant="amber"
             onClick={exportToN8n}
             disabled={exporting}
@@ -181,6 +239,21 @@ export function CarouselStage({ result }: { result: AnalyzeResult }) {
           ) : null}
           {voiceMsg ? (
             <p className="text-xs text-muted">{voiceMsg}</p>
+          ) : null}
+          {mediaMsg ? (
+            <p className="text-xs text-muted" data-testid="media-package-msg">
+              {mediaMsg}
+            </p>
+          ) : null}
+          {mediaDownloadUrl ? (
+            <a
+              href={mediaDownloadUrl}
+              className="inline-flex text-sm font-medium text-electric underline"
+              data-testid="media-package-download"
+              download
+            >
+              Download ZIP
+            </a>
           ) : null}
           {exportMsg ? (
             <p className="text-xs text-muted">{exportMsg}</p>

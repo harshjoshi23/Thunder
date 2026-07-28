@@ -15,6 +15,7 @@
     "db:generate": "DATABASE_URL=\"${DATABASE_URL:-postgresql://thunder:thunder@127.0.0.1:5432/thunder}\" prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:migrate:dev": "prisma migrate dev",
+    "media:reel": "bash scripts/compose-reel.sh",
     "postinstall": "npm run db:generate"
   },
   "dependencies": {
@@ -25,9 +26,11 @@
     "@prisma/client": "^6.19.0",
     "@upstash/redis": "^1.38.0",
     "clsx": "^2.1.1",
+    "jszip": "^3.10.1",
     "lucide-react": "^1.26.0",
     "next": "15.3.5",
     "openai": "^6.49.0",
+    "pdf-lib": "^1.17.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.6.0",
@@ -37,6 +40,7 @@
     "@eslint/eslintrc": "^3",
     "@playwright/test": "^1.62.0",
     "@tailwindcss/postcss": "^4",
+    "@types/jszip": "^3.4.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

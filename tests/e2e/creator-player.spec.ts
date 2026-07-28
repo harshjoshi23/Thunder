@@ -64,9 +64,28 @@ test.describe("Thunder creator player (seeded)", () => {
     await goToStage(page, "Carousel");
     await expect(page.getByTestId("stage-carousel")).toBeVisible();
     await expect(page.getByTestId("cover-image")).toBeVisible();
+    await expect(page.getByTestId("export-media-package")).toBeVisible();
     await expect(page.getByText(/Generate Reel/i)).toHaveCount(0);
     await shot(page, "carousel-light-desktop");
 
+    // Smoke: export button → mocked package API (no credits)
+    await page.route("**/api/media/package", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          ok: true,
+          downloadUrl: "/api/media/files/test/thunder-media.zip",
+          message: "Media package ready (mocked e2e).",
+          voiceoverMode: "skipped",
+        }),
+      });
+    });
+    await page.getByTestId("export-media-package").click();
+    await expect(page.getByTestId("media-package-download")).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByTestId("media-package-msg")).toContainText(/ready/i);
     await goToStage(page, "Before / After");
     await expect(page.getByTestId("stage-before-after")).toBeVisible();
     await shot(page, "before-after-light-desktop");

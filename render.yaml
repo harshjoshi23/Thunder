@@ -64,7 +64,7 @@ services:
         value: "3600000"
       - key: FORCE_SEEDED_DEMO
         value: "false"
-      # Phase 0 harden — set in dashboard (do not commit secrets)
+      # Optional Redis / auth / monitoring — set in dashboard (do not commit secrets)
       - key: UPSTASH_REDIS_REST_URL
         sync: false
       - key: UPSTASH_REDIS_REST_TOKEN
@@ -77,7 +77,7 @@ services:
         sync: false
       - key: SENTRY_DSN
         sync: false
-      # Phase 1 Studio — Postgres + optional Stripe (set in dashboard)
+      # Optional Studio — Postgres + Stripe (set in dashboard)
       - key: DATABASE_URL
         sync: false
       - key: STRIPE_SECRET_KEY
@@ -86,7 +86,7 @@ services:
         sync: false
       - key: STRIPE_PRICE_CREATOR_PRO
         sync: false
-      # Phase 2 Media — optional object storage (local .data/exports fallback)
+      # Optional media object storage (local .data/exports fallback)
       - key: MEDIA_EXPORT_DIR
         sync: false
       - key: S3_BUCKET
